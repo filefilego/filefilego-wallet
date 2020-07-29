@@ -201,6 +201,29 @@ ipcMain.on("import_wallet", async (evt, arg) => {
   }
 });
 
+ipcMain.on("load_settings", async (evt, arg) => {
+  let destinationSettings =
+    homeDir + ".filefilego_wallet" + path.sep + "settings.json";
+
+  let jsonSettings = {
+    wallet_rpc_endpoint: "",
+  };
+
+  if (fs.existsSync(destinationSettings)) {
+    let content = fs.readFileSync(destinationSettings);
+    jsonSettings = JSON.parse(content);
+  }
+
+  evt.returnValue = jsonSettings;
+});
+
+ipcMain.on("save_settings", async (evt, arg) => {
+  let destinationSettings =
+    homeDir + ".filefilego_wallet" + path.sep + "settings.json";
+  fs.writeFileSync(destinationSettings, JSON.stringify(arg));
+  evt.returnValue = true;
+});
+
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
   if (process.platform === "win32") {

@@ -88,96 +88,118 @@
             >Transactions</span
           >
         </div>
-       
-        <div>
-          <table class="uk-table uk-table-striped">
-            <tbody>
-              <tr
-                v-for="(transaction, i) in transactions"
-                :key="transaction.Hash + i"
-              >
-                <td>
-                  <div uk-grid>
-                    <div
-                      class="uk-width-auto"
-                      style=" margin-top: 2px; width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgb(102, 102, 102); text-align: center;"
-                    >
-                      <span
-                        style="font-size: 1.2em; margin-top: 10px; display: inline-block; vertical-align: middle;"
-                        class=""
-                        :class="
-                          transaction.From ==
-                          addressFromKeyname(selected_wallet_status.address)
-                            ? 'icon-arrow-up2'
-                            : 'icon-arrow-down2'
-                        "
-                      ></span>
-                    </div>
-                    <div class="uk-width-expand">
-                      <div style="padding-left:7px;">
-                        <h4 style="margin-bottom: 0px;">
-                          {{
+
+        <div v-if="loading">
+          <div class="uk-text-center">
+            <span
+              class="ffg-spinner icon-spinner10"
+              style="font-size:6em; color:#3e15ca; margin-right:6px; vertical-align: middle;"
+            ></span>
+          </div>
+        </div>
+        <div v-else>
+          <div v-if="!offline">
+            <table class="uk-table uk-table-striped">
+              <tbody>
+                <tr
+                  v-for="(transaction, i) in transactions"
+                  :key="transaction.Hash + i"
+                >
+                  <td>
+                    <div uk-grid>
+                      <div
+                        class="uk-width-auto"
+                        style=" margin-top: 2px; width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgb(102, 102, 102); text-align: center;"
+                      >
+                        <span
+                          style="font-size: 1.2em; margin-top: 10px; display: inline-block; vertical-align: middle;"
+                          class=""
+                          :class="
                             transaction.From ==
                             addressFromKeyname(selected_wallet_status.address)
-                              ? "Sent"
-                              : "Received"
-                          }}
-                        </h4>
-                        <div style="margin-top:-7px;">
-                          <p style="margin: 0;">
-                            <span style="font-weight:bold;"
-                              >{{
-                                transaction.From ==
-                                addressFromKeyname(
-                                  selected_wallet_status.address
-                                )
-                                  ? "To"
-                                  : "From"
-                              }}:
-                              {{
-                                transaction.From ==
-                                addressFromKeyname(
-                                  selected_wallet_status.address
-                                )
-                                  ? transaction.To
-                                  : transaction.From
-                              }}</span
-                            >
-                          </p>
+                              ? 'icon-arrow-up2'
+                              : 'icon-arrow-down2'
+                          "
+                        ></span>
+                      </div>
+                      <div class="uk-width-expand">
+                        <div style="padding-left:7px;">
+                          <h4 style="margin-bottom: 0px;">
+                            {{
+                              transaction.From ==
+                              addressFromKeyname(selected_wallet_status.address)
+                                ? "Sent"
+                                : "Received"
+                            }}
+                          </h4>
+                          <div style="margin-top:-7px;">
+                            <p style="margin: 0;">
+                              <span style="font-weight:bold;"
+                                >{{
+                                  transaction.From ==
+                                  addressFromKeyname(
+                                    selected_wallet_status.address
+                                  )
+                                    ? "To"
+                                    : "From"
+                                }}:
+                                {{
+                                  transaction.From ==
+                                  addressFromKeyname(
+                                    selected_wallet_status.address
+                                  )
+                                    ? transaction.To
+                                    : transaction.From
+                                }}</span
+                              >
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </td>
-                <td class="uk-text-right">
-                  <span
-                    :style="
-                      transaction.From ==
-                      addressFromKeyname(selected_wallet_status.address)
-                        ? 'color: #ff1100;'
-                        : 'color: #47c463;'
-                    "
-                    style="text-transform: none;  font-weight: bold; font-size: 1.5em;"
-                    >{{
-                      transaction.From ==
-                      addressFromKeyname(selected_wallet_status.address)
-                        ? "-"
-                        : "+"
-                    }}{{ HexAmountToAran(transaction.Value) }} Z</span
-                  >
-                </td>
-              </tr>
-
-             
-            </tbody>
-          </table>
+                  </td>
+                  <td class="uk-text-right">
+                    <span
+                      :style="
+                        transaction.From ==
+                        addressFromKeyname(selected_wallet_status.address)
+                          ? 'color: #ff1100;'
+                          : 'color: #47c463;'
+                      "
+                      style="text-transform: none;  font-weight: bold; font-size: 1.5em;"
+                      >{{
+                        transaction.From ==
+                        addressFromKeyname(selected_wallet_status.address)
+                          ? "-"
+                          : "+"
+                      }}{{ HexAmountToAran(transaction.Value) }} Z</span
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div v-else>
+            <div class="uk-text-center">
+              <div style="background-color:#d31056; padding:15px;">
+                <h4 style="color:#fff; margin:0; padding:0;">
+                  Network connection error
+                </h4>
+              </div>
+              <div style="background-color:#f8f8f8; padding:15px;">
+                <p class="med-text" style="font-size:1.1em; margin-top:20px;">
+                  Please check your internet connection or make sure the remote
+                  ip is resolvable.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <div ref="receive_transaction" class="uk-modal" uk-modal="bg-close:false;">
       <div class="uk-modal-dialog uk-margin-auto-vertical">
-     
         <button
           class="uk-modal-close-default"
           style="left: 5px; top: 15px; right: 0px;"
@@ -196,7 +218,7 @@
               sure to copy the address exactly as it is.
             </span>
 
-            <form style="margin-top:17px;" method="post">
+            <div style="margin-top:17px;">
               <div class="uk-margin">
                 <div style="width:100%;" class="uk-inline">
                   <span
@@ -224,7 +246,7 @@
                   Copy Address</button
                 ><br />
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
@@ -232,7 +254,6 @@
 
     <div ref="send_transaction" class="uk-modal" uk-modal="bg-close:false;">
       <div class="uk-modal-dialog uk-margin-auto-vertical">
-       
         <button
           class="uk-modal-close-default"
           style="left: 5px; top: 15px; right: 0px;"
@@ -251,7 +272,7 @@
               the fees.
             </span>
 
-            <form style="margin-top:40px;" method="post">
+            <div style="margin-top:40px;">
               <div class="uk-margin">
                 <div style="width:100%;" class="uk-inline">
                   <span
@@ -310,7 +331,7 @@
                   Send</button
                 ><br />
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
@@ -327,28 +348,39 @@ const BN = require("bn.js");
 export default {
   data() {
     return {
+      loading: true,
       balance: "0",
       transactions: [],
       amount: "",
       fees: "",
       destination_address: "",
+      offline: false,
     };
   },
   components: {},
   computed: {
+    rpcEndpoint() {
+      return this.$store.state.rpc_endpoint;
+    },
     selected_wallet_status() {
       return this.$store.state.selected_wallet_status;
     },
   },
   mounted() {
-    this.getDataFromRPC(
-      this.addressFromKeyname(this.selected_wallet_status.address)
-    );
-    this.getLastTransactions(
-      this.addressFromKeyname(this.selected_wallet_status.address)
-    );
+    this.loadData();
   },
   methods: {
+    async loadData() {
+      this.loading = true;
+      await this.getDataFromRPC(
+        this.addressFromKeyname(this.selected_wallet_status.address)
+      );
+      await this.getLastTransactions(
+        this.addressFromKeyname(this.selected_wallet_status.address)
+      );
+
+      this.loading = false;
+    },
     HexAmountToAran(val) {
       let amount = new BN(val.slice(2), 16);
       return unitUtil
@@ -359,12 +391,10 @@ export default {
       window.UIkit.modal(this.$refs.receive_transaction).show();
     },
     async SendCoins() {
-     
-
       try {
         let addr = this.addressFromKeyname(this.selected_wallet_status.address);
 
-        const res = await axios.post("http://localhost:8090/", {
+        const res = await axios.post(this.rpcEndpoint, {
           jsonrpc: "2.0",
           method: "account_balance",
           params: [addr],
@@ -388,7 +418,7 @@ export default {
 
         let signedTx = ipcRenderer.sendSync("sign_transaction", tx);
 
-        await axios.post("http://localhost:8090/", {
+        await axios.post(this.rpcEndpoint, {
           jsonrpc: "2.0",
           method: "transaction_sendRawTransaction",
           params: [JSON.stringify(signedTx)],
@@ -403,7 +433,7 @@ export default {
     },
     async getDataFromRPC(address) {
       try {
-        const res = await axios.post("http://localhost:8090/", {
+        const res = await axios.post(this.rpcEndpoint, {
           jsonrpc: "2.0",
           method: "account_balance",
           params: [address],
@@ -411,12 +441,14 @@ export default {
         });
         this.balance = res.data.result.balance;
       } catch (e) {
-        console.log(e);
+        if (e.message == "Network Error") {
+          this.offline = true;
+        }
       }
     },
     async getLastTransactions(address) {
       try {
-        const res = await axios.post("http://localhost:8090/", {
+        const res = await axios.post(this.rpcEndpoint, {
           jsonrpc: "2.0",
           method: "transaction_byAddress",
           params: [address],
@@ -424,7 +456,10 @@ export default {
         });
         this.transactions = [...res.data.result];
       } catch (e) {
-        console.log(e);
+        // console.log(e);
+        if (e.message == "Network Error") {
+          this.offline = true;
+        }
       }
     },
     copyAddressToClipboard() {

@@ -161,7 +161,7 @@
         </div>
         <div style="padding:0; margin-top:0px;" class="uk-modal-body">
           <div class="uk-text-center" style="padding:15px;">
-            <form style="margin-top:10px;" method="post">
+            <div style="margin-top:10px;">
               <span style="display: inline-block; margin-top: 5px;">
                 Click on "Select Key File" and enter your password to import
                 your key to this wallet.
@@ -219,7 +219,7 @@
                   Import</button
                 ><br />
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
@@ -247,7 +247,7 @@
           class="uk-modal-body"
         >
           <div class="uk-text-center" style="padding:15px;">
-            <form style="margin-top:10px;" method="post">
+            <div style="margin-top:10px;">
               <h4
                 style="color: rgb(13, 13, 13); padding-bottom:0; margin-bottom:0;"
                 class="header-display-1"
@@ -262,7 +262,51 @@
                   Key was successfully imported!
                 </span>
               </h4>
-            </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      ref="success_created_wallet"
+      class="uk-modal"
+      uk-modal="bg-close:false;"
+    >
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <button
+          class="uk-modal-close-default"
+          style="left: 5px; top: 15px; right: 0px;"
+          type="button"
+          uk-close
+        ></button>
+        <div class="uk-modal-header">
+          <h2 style="font-size: 1.1em;" class="uk-modal-title header-display-1">
+            Successful
+          </h2>
+        </div>
+        <div
+          style="padding:0; margin-top:0px; padding-bottom:20px;"
+          class="uk-modal-body"
+        >
+          <div class="uk-text-center" style="padding:15px;">
+            <div style="margin-top:10px;">
+              <h4
+                style="color: rgb(13, 13, 13); padding-bottom:0; margin-bottom:0;"
+                class="header-display-1"
+              >
+                <span
+                  class="icon-notification"
+                  style="vertical-align:middle; display:inline-block; font-size:1.7em; color:green; margin-right:5px;"
+                ></span>
+                <span
+                  style="vertical-align:middle; display:inline-block; color:green; "
+                >
+                  Your wallet was successfully created. You can now select and
+                  unlock it.
+                </span>
+              </h4>
+            </div>
           </div>
         </div>
       </div>
@@ -322,7 +366,7 @@
               </div>
             </div>
 
-            <form style="margin-top:40px;" method="post">
+            <div style="margin-top:40px;">
               <div class="uk-margin">
                 <div style="width:100%;" class="uk-inline">
                   <span
@@ -385,7 +429,7 @@
                   unlock your wallet.
                 </span>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
@@ -519,6 +563,8 @@ export default {
       this.loading = true;
       ipcRenderer.on("create_wallet-reply", (event, arg) => {
         window.UIkit.modal(this.$refs.create_wallet).hide();
+        window.UIkit.modal(this.$refs.success_created_wallet).show();
+
         this.loading = false;
         ipcRenderer.send("accounts");
         dialog

@@ -405,9 +405,7 @@ export default {
       this.loading = false;
     },
     HexAmountToAran(val) {
-      console.log("val", val);
       let amount = new BN(val.slice(2), 16);
-      console.log();
       return unitUtil.fromAran(amount.toString(10), "zaran").toString(10);
     },
     showReceiveCoins() {

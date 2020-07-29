@@ -178,6 +178,29 @@
                 </tr>
               </tbody>
             </table>
+            <div v-show="transactions.length == 0">
+              <div>
+                <div class="uk-text-center">
+                  <div
+                    style="background-color:#3e15ca; padding:15px; border-radius:12px 12px 0px 0px;"
+                  >
+                    <h4
+                      style="color:#fff; margin:0; padding:0; font-weight:bold;"
+                    >
+                      No transactions associated with this address
+                    </h4>
+                  </div>
+                  <div style="background-color:#f8f8f8; padding:15px;">
+                    <p
+                      class="med-text"
+                      style="font-size:1.1em; margin-top:20px;"
+                    >
+                      There are no transactions for this address yet.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div v-else>
             <div class="uk-text-center">

@@ -453,6 +453,7 @@ export default {
       password_confirmation: "",
       unlock_password: "",
       error: "",
+      saveDialogRegistered: false,
     };
   },
   beforeDestroy() {
@@ -559,26 +560,28 @@ export default {
       )
         return;
 
-      ipcRenderer.send("create_wallet", this.password);
       this.loading = true;
-      ipcRenderer.on("create_wallet-reply", (event, arg) => {
-        window.UIkit.modal(this.$refs.create_wallet).hide();
-        window.UIkit.modal(this.$refs.success_created_wallet).show();
+      ipcRenderer.send("create_wallet", this.password);
+      if (!this.saveDialogRegistered)
+        ipcRenderer.on("create_wallet-reply", (event, arg) => {
+          this.saveDialogRegistered = true;
+          window.UIkit.modal(this.$refs.create_wallet).hide();
+          window.UIkit.modal(this.$refs.success_created_wallet).show();
 
-        this.loading = false;
-        ipcRenderer.send("accounts");
-        dialog
-          .showOpenDialog({ properties: ["openDirectory"] })
-          .then((result) => {
-            if (!result.canceled) {
-              let destinationDir = result.filePaths[0];
-              ipcRenderer.send("save_wallet", {
-                destination: destinationDir,
-                payload: arg,
-              });
-            }
-          });
-      });
+          this.loading = false;
+          ipcRenderer.send("accounts");
+          dialog
+            .showOpenDialog({ properties: ["openDirectory"] })
+            .then((result) => {
+              if (!result.canceled) {
+                let destinationDir = result.filePaths[0];
+                ipcRenderer.send("save_wallet", {
+                  destination: destinationDir,
+                  payload: arg,
+                });
+              }
+            });
+        });
       // this.wallets.push({ address: res.address });
     },
     openNewWalletDialog() {

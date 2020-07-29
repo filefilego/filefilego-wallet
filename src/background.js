@@ -82,6 +82,8 @@ app.on("ready", async () => {
   createWindow();
 });
 
+// win.setMenuBarVisibility(false);
+
 ipcMain.on("close-me", (evt, arg) => {
   app.quit();
 });

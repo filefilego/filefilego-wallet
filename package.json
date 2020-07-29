@@ -4,12 +4,6 @@
   "version": "0.5.1",
   "description": "FileFileGo Wallet and Downloader",
   "private": true,
-  "build": {
-    "appId": "filefilego.com.wallet",
-    "mac": {
-      "category": "filefilego.com.wallet"
-    }
-  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",

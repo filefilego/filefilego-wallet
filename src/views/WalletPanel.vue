@@ -4,7 +4,7 @@
       style="color: rgb(13, 13, 13); border-bottom: 1px solid #ddd; padding-bottom: 11px; margin-bottom: 0px !important;"
       class="header-display-1"
     >
-      My Wallet:
+      Address:
       <span
         class="icon-copy"
         uk-tooltip="Copy"
@@ -53,7 +53,7 @@
                 style="color: #fff; font-size: 1.8em; margin-top: 9px; text-align: center;"
                 class="header-display-1"
               >
-                {{ balance }} ZARAN
+                {{ HexAmountToAran(balance) }} ZARAN
               </h1>
             </div>
           </div>
@@ -85,7 +85,7 @@
         </div>
         <div style="padding: 8px 10px;">
           <span style="text-transform: none; color: black; font-weight: bold"
-            >Transactions</span
+            >Last 10 transactions</span
           >
         </div>
 
@@ -102,9 +102,50 @@
             <table class="uk-table uk-table-striped">
               <tbody>
                 <tr
-                  v-for="(transaction, i) in transactions"
-                  :key="transaction.Hash + i"
+                  v-show="
+                    transaction.From ==
+                      addressFromKeyname(selected_wallet_status.address)
+                  "
+                  v-for="(transaction, i) in pending_txs"
+                  :key="i"
                 >
+                  <td>
+                    <div uk-grid>
+                      <div class="uk-width-auto" style=" ">
+                        <span
+                          uk-tooltip="Waiting to verify"
+                          class="icon-spinner7 ffg-spinner"
+                          style="font-size:2em; vertical-align:middle; margin-right:6px; color:#3e15ca; margin-top:7px; "
+                        ></span>
+                      </div>
+                      <div class="uk-width-expand">
+                        <div style="padding-left:7px;">
+                          <h4 style="margin-bottom: 0px;">
+                            Sent
+                            <span style=" font-weight:bold;">
+                              {{ transaction.Timestamp8601 | formaldatetime }}
+                            </span>
+                          </h4>
+                          <div style="margin-top:-7px;">
+                            <p style="margin: 0;">
+                              <span style="font-weight:bold;"
+                                >To: {{ transaction.To }}</span
+                              >
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="uk-text-right">
+                    <span
+                      style="color: #ff1100; text-transform: none;  font-weight: bold; font-size: 1.5em;"
+                      >-{{ HexAmountToAran(transaction.Value) }} Z</span
+                    >
+                  </td>
+                </tr>
+
+                <tr v-for="(transaction, i) in transactions" :key="i">
                   <td>
                     <div uk-grid>
                       <div
@@ -115,7 +156,7 @@
                           style="font-size: 1.2em; margin-top: 10px; display: inline-block; vertical-align: middle;"
                           class=""
                           :class="
-                            transaction.From ==
+                            transaction.Transaction.From ==
                             addressFromKeyname(selected_wallet_status.address)
                               ? 'icon-arrow-up2'
                               : 'icon-arrow-down2'
@@ -126,17 +167,20 @@
                         <div style="padding-left:7px;">
                           <h4 style="margin-bottom: 0px;">
                             {{
-                              transaction.From ==
+                              transaction.Transaction.From ==
                               addressFromKeyname(selected_wallet_status.address)
                                 ? "Sent"
                                 : "Received"
                             }}
+                            <span style=" font-weight:bold;">
+                              {{ transaction.Timestamp8601 | formaldatetime }}
+                            </span>
                           </h4>
                           <div style="margin-top:-7px;">
                             <p style="margin: 0;">
                               <span style="font-weight:bold;"
                                 >{{
-                                  transaction.From ==
+                                  transaction.Transaction.From ==
                                   addressFromKeyname(
                                     selected_wallet_status.address
                                   )
@@ -144,12 +188,12 @@
                                     : "From"
                                 }}:
                                 {{
-                                  transaction.From ==
+                                  transaction.Transaction.From ==
                                   addressFromKeyname(
                                     selected_wallet_status.address
                                   )
-                                    ? transaction.To
-                                    : transaction.From
+                                    ? transaction.Transaction.To
+                                    : transaction.Transaction.From
                                 }}</span
                               >
                             </p>
@@ -161,18 +205,21 @@
                   <td class="uk-text-right">
                     <span
                       :style="
-                        transaction.From ==
+                        transaction.Transaction.From ==
                         addressFromKeyname(selected_wallet_status.address)
                           ? 'color: #ff1100;'
                           : 'color: #47c463;'
                       "
                       style="text-transform: none;  font-weight: bold; font-size: 1.5em;"
                       >{{
-                        transaction.From ==
+                        transaction.Transaction.From ==
                         addressFromKeyname(selected_wallet_status.address)
                           ? "-"
                           : "+"
-                      }}{{ HexAmountToAran(transaction.Value) }} Z</span
+                      }}{{
+                        HexAmountToAran(transaction.Transaction.Value)
+                      }}
+                      Z</span
                     >
                   </td>
                 </tr>
@@ -310,6 +357,14 @@
                     required="true"
                   />
                 </div>
+                <div
+                  class="uk-text-left"
+                  style="padding-left:16px; padding-top:4px;"
+                >
+                  <span v-show="errorAddr != ''" style="color:red;"
+                    >⚫ {{ errorAddr }}</span
+                  >
+                </div>
               </div>
 
               <div class="uk-margin">
@@ -325,6 +380,14 @@
                     placeholder="Amount (e.g. 100)"
                     required="true"
                   />
+                </div>
+                <div
+                  class="uk-text-left"
+                  style="padding-left:16px; padding-top:4px;"
+                >
+                  <span v-show="amountError != ''" style="color:red;"
+                    >⚫ {{ amountError }}</span
+                  >
                 </div>
               </div>
 
@@ -342,10 +405,33 @@
                     required="true"
                   />
                 </div>
+                <div
+                  class="uk-text-left"
+                  style="padding-left:16px; padding-top:4px;"
+                >
+                  <span v-show="feesError != ''" style="color:red;"
+                    >⚫ {{ feesError }}</span
+                  >
+                </div>
               </div>
 
               <div class="uk-margin uk-text-center" style="padding:15px;">
+                <div
+                  class="uk-text-left"
+                  style="padding-left:16px; padding-top:4px;"
+                >
+                  <span v-show="error_result != ''" style="color:red;"
+                    >⚫ {{ error_result }}</span
+                  >
+                </div>
+
+                <span
+                  v-show="loading_sendcoin"
+                  class="icon-spinner9 ffg-spinner"
+                  style="font-size:1.7em; vertical-align:middle; margin-right:10px; color:#3e15ca;"
+                ></span>
                 <button
+                  :disabled="loading_sendcoin"
                   @click="SendCoins()"
                   type="button"
                   class="uk-button uk-button-default"
@@ -365,23 +451,36 @@
 <script>
 const { ipcRenderer } = window.require("electron");
 const { clipboard } = window.require("electron");
+
+import ks from "../keystore";
 import unitUtil from "../units";
 import axios from "axios";
 const BN = require("bn.js");
 export default {
   data() {
     return {
-      loading: true,
+      loading_sendcoin: false,
+      error_result: "",
+      loading: false,
       balance: "0",
       transactions: [],
+      errorAddr: "fc",
       amount: "",
+      amountError: "",
       fees: "",
+      feesError: "",
       destination_address: "",
       offline: false,
     };
   },
   components: {},
   computed: {
+    loading_wallet() {
+      return this.$store.state.loading_wallet;
+    },
+    pending_txs() {
+      return this.$store.state.pending_txs;
+    },
     rpcEndpoint() {
       return this.$store.state.rpc_endpoint;
     },
@@ -389,12 +488,43 @@ export default {
       return this.$store.state.selected_wallet_status;
     },
   },
+  beforeDestroy() {
+    clearInterval(this.refreshInterval);
+  },
   mounted() {
-    this.loadData();
+    // let bts = Buffer.from(
+    //   ks.DecodeHex(
+    //     "9c1e92a50dc7e13265255f7388926ab8a9310d14359045561bce6ca0db8fc5f2"
+    //   )
+    // );
+    // console.log(bts.toString("base64"));
+
+    this.errorAddr = "";
+    this.amountError = "";
+    this.feesError = "";
+    this.loadData(true);
+    this.refreshInterval = setInterval(() => {
+      this.loadData(false);
+    }, 11000);
+  },
+  watch: {
+    fees: function() {
+      this.validInputs();
+    },
+    amount: function() {
+      this.validInputs();
+    },
+    destination_address: function() {
+      this.validInputs();
+    },
   },
   methods: {
-    async loadData() {
-      this.loading = true;
+    async loadData(first) {
+      if (this.loading) return;
+      if (first) this.loading = true;
+
+      this.$store.dispatch("SetLoadingWallet", true);
+
       await this.getDataFromRPC(
         this.addressFromKeyname(this.selected_wallet_status.address)
       );
@@ -402,7 +532,18 @@ export default {
         this.addressFromKeyname(this.selected_wallet_status.address)
       );
 
+      this.transactions.map((o) => {
+        let hash = new Buffer(o.Transaction.Hash, "base64");
+        o.Transaction.Hash = `0x${ks.EncodeBytesToHex(hash)}`;
+        this.pending_txs.map((j) => {
+          if (j.Hash == o.Transaction.Hash) {
+            this.$store.dispatch("RemovePendingTxs", j);
+          }
+        });
+      });
+
       this.loading = false;
+      this.$store.dispatch("SetLoadingWallet", false);
     },
     HexAmountToAran(val) {
       let amount = new BN(val.slice(2), 16);
@@ -411,9 +552,48 @@ export default {
     showReceiveCoins() {
       window.UIkit.modal(this.$refs.receive_transaction).show();
     },
+    validInputs() {
+      if (this.destination_address.substring(0, 2) != "0x") {
+        this.errorAddr = "Address must begin with '0x'";
+        return false;
+      }
+
+      if (this.destination_address.length != 42) {
+        this.errorAddr = "Address must be 42 characters";
+        return false;
+      } else {
+        this.errorAddr = "";
+      }
+
+      if (this.amount == "") {
+        this.amountError = "Amount is required";
+        return false;
+      }
+
+      let decimalRegex = /^\d+(\.\d+)*$/;
+      if (!decimalRegex.test(`${this.amount}`)) {
+        this.amountError = "Amount is invalid";
+        return false;
+      }
+
+      this.amountError = "";
+
+      if (!decimalRegex.test(`${this.fees}`)) {
+        this.feesError = "Fees amount is invalid";
+        return false;
+      }
+
+      this.feesError = "";
+
+      return true;
+    },
     async SendCoins() {
       try {
+        this.error_result = "";
         let addr = this.addressFromKeyname(this.selected_wallet_status.address);
+
+        let validRes = this.validInputs();
+        if (!validRes) return;
 
         const res = await axios.post(this.rpcEndpoint, {
           jsonrpc: "2.0",
@@ -421,10 +601,23 @@ export default {
           params: [addr],
           id: 1,
         });
+        let amountHex;
+        try {
+          amountHex = "0x" + unitUtil.toAran(this.amount, "zaran").toString(16);
+        } catch (e) {
+          this.amountError = e.message;
+          return;
+        }
 
-        let amountHex =
-            "0x" + unitUtil.toAran(this.amount, "zaran").toString(16),
+        let feesHex;
+        try {
           feesHex = "0x" + unitUtil.toAran(this.fees, "zaran").toString(16);
+        } catch (e) {
+          this.feesError = e.message;
+          return;
+        }
+
+        this.loading_sendcoin = true;
 
         let tx = {
           Nounce: res.data.result.next_nounce,
@@ -439,14 +632,43 @@ export default {
 
         let signedTx = ipcRenderer.sendSync("sign_transaction", tx);
 
-        await axios.post(this.rpcEndpoint, {
+        const rawRes = await axios.post(this.rpcEndpoint, {
           jsonrpc: "2.0",
           method: "transaction_sendRawTransaction",
           params: [JSON.stringify(signedTx)],
           id: 1,
         });
+
+        if ("error" in rawRes.data) {
+          this.error_result = rawRes.data.error.message;
+          return;
+        }
+
+        this.$store.dispatch("AddPendingTxs", {
+          Hash: rawRes.data.result,
+          Timestamp8601: new Date(),
+          To: this.destination_address,
+          From: addr,
+          Value: amountHex,
+          TransactionFees: feesHex,
+        });
+
+        window.UIkit.modal(this.$refs.send_transaction).hide();
+
+        this.destination_address = "";
+        this.amount = "";
+        this.fees = "";
+        // everything is ok, put it recent transactions
+
+        //  { result: "0x9c1e92a50dc7e13265255f7388926ab8a9310d14359045561bce6ca0db8fc5f2" ... }
+
+        // { error: {code: -32000, message: "a transaction with the same nounce is already in mempool" }}}
+
+        console.log(rawRes.data);
       } catch (e) {
-        console.log(e);
+        console.log(e.message);
+      } finally {
+        this.loading_sendcoin = false;
       }
     },
     openSendModal() {
@@ -460,7 +682,7 @@ export default {
           params: [address],
           id: 1,
         });
-        this.balance = res.data.result.balance;
+        this.balance = res.data.result.balance_hex;
       } catch (e) {
         if (e.message == "Network Error") {
           this.offline = true;
@@ -512,5 +734,14 @@ export default {
 .uk-table td {
   padding: 8px 9px;
   vertical-align: top;
+}
+
+.uk-button-default:disabled,
+.uk-button-primary:disabled,
+.uk-button-secondary:disabled,
+.uk-button-danger:disabled {
+  background-color: #f8f8f8 !important;
+  color: #999 !important;
+  border: 1px solid #d2d2d2 !important;
 }
 </style>

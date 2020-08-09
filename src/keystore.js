@@ -64,7 +64,6 @@ const SignTransaction = async (tx, key) => {
 };
 
 const PrepareKeyFilename = (address) => {
-  let ts = "";
   let dt = new Date();
   let str = `UTC--${dt.toISOString()}--${address}.json`;
   return str.replace(/:/g, "-");
@@ -185,4 +184,6 @@ export default {
   MarshalKey,
   NewKeyAndStoreToPathAndReturnJSON,
   SignTransaction,
+  DecodeHex,
+  EncodeBytesToHex,
 };

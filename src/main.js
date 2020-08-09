@@ -22,3 +22,7 @@ new Vue({
     this.$store.dispatch("SetSettings", settings);
   },
 }).$mount("#app");
+
+Vue.filter("formaldatetime", (val) => {
+  return new Date(val).toLocaleString();
+});

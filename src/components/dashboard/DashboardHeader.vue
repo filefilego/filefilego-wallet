@@ -18,6 +18,13 @@
         <rect y="15" width="20" height="2"></rect>
       </svg>
     </span>
+
+    <span
+      v-show="loading_wallet"
+      class="icon-spinner7 ffg-spinner"
+      style="font-size:2em; vertical-align:middle; margin-right:10px; color:#3e15ca; margin-top:12px; margin-left:10px;"
+    ></span>
+
     <div
       style="z-index: 99999999; position: fixed; right: 4px; top: 2px; margin-right: 8px; margin-top: 0px; "
     >
@@ -51,6 +58,9 @@ export default {
   computed: {
     user() {
       return "user";
+    },
+    loading_wallet() {
+      return this.$store.state.loading_wallet;
     },
   },
   methods: {

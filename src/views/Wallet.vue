@@ -163,18 +163,23 @@
           <div class="uk-text-center" style="padding:15px;">
             <div style="margin-top:10px;">
               <span style="display: inline-block; margin-top: 5px;">
-                Click on "Select Key File" and enter your password to import
-                your key to this wallet.
+                Click on "Select Keystore file" and enter your password to
+                import your wallet
               </span>
-
+              <br />
+              <span
+                v-show="selected_keystore_file_import != ''"
+                class="icon-checkmark"
+                style="color:green; font-size:2em; padding:5px; border:3px solid green; border-radius:50%; vertical-align:middle; display:inline-block; margin-top:8px; margin-right:5px;"
+              ></span>
               <button
                 @click="importWallet()"
                 type="button"
                 class="uk-button uk-button-default"
-                style=" margin-top:10px; border-radius: 4px;width: 157px;background-color: #607d8b;color: rgb(255, 255, 255); border: 1px solid #57707c;padding: 0px;line-height: 34px;height: 47px;font-weight: bold;"
+                style="margin-top:10px; border-radius: 4px;width: 220px;background-color: #607d8b;color: rgb(255, 255, 255); border: 1px solid #57707c;padding: 0px;line-height: 34px;height: 47px;font-weight: bold;"
               >
                 <span class="icon-key" style="margin-right:4px;"></span>
-                Select Key File</button
+                Select Keystore File</button
               ><br />
 
               <div class="uk-margin">
@@ -259,7 +264,7 @@
                 <span
                   style="vertical-align:middle; display:inline-block; color:green; "
                 >
-                  Key was successfully imported!
+                  Keystore file was successfully imported!
                 </span>
               </h4>
             </div>
@@ -468,6 +473,7 @@ export default {
     },
   },
   mounted() {
+    this.selected_keystore_file_import = "";
     ipcRenderer.on("accounts-reply", (event, arg) => {
       this.loading = false;
       // this.wallets = [...arg];
@@ -501,6 +507,9 @@ export default {
       } else {
         window.UIkit.modal(this.$refs.import_wallet).hide();
         window.UIkit.modal(this.$refs.success_import_wallet).show();
+
+        // refresh the accounts
+        ipcRenderer.send("accounts");
       }
     },
     openImportWalletModal() {

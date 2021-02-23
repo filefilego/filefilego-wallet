@@ -482,10 +482,10 @@ export default {
 
     this.loading = true;
     ipcRenderer.send("accounts");
-    this.$store.dispatch("SetSelectedWalletStatus", {
-      address: "",
-      unlocked: false,
-    });
+    // this.$store.dispatch("SetSelectedWalletStatus", {
+    //   address: "",
+    //   unlocked: false,
+    // });
   },
   computed: {
     wallets() {

@@ -28,12 +28,17 @@ const NewKeypair = async () => {
 
 const SignTransaction = async (tx, key) => {
   let publicDt = key.public.bytes.slice(4);
-
   let publicKeyString = "0x" + EncodeBytesToHex(publicDt);
+
+
+  let txData = Buffer.from("")
+  if(tx.Data != "") {
+    txData = DecodeHex(tx.Data);
+    tx.Data = "0x" + tx.Data;
+  }
 
   let pubKey = Buffer.from(publicKeyString),
     nounce = Buffer.from(tx.Nounce),
-    txData = Buffer.from(tx.Data),
     from = Buffer.from(tx.From),
     to = Buffer.from(tx.To),
     value = Buffer.from(tx.Value),
@@ -48,6 +53,7 @@ const SignTransaction = async (tx, key) => {
     to,
     value,
     transactionFees,
+    DecodeHex("01")
   ]);
 
   var hasher = sha256.create();
@@ -59,7 +65,7 @@ const SignTransaction = async (tx, key) => {
   tx.Hash = "0x" + hashTx;
   let signedDt = await key.sign(DecodeHex(hashTx));
   tx.Signature = "0x" + EncodeBytesToHex(Buffer.from(signedDt));
-
+  
   return tx;
 };
 

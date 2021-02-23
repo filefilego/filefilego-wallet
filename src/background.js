@@ -8,6 +8,7 @@ import keystore from "./keystore";
 const isDevelopment = process.env.NODE_ENV !== "production";
 const path = require("path");
 const fs = require("fs");
+const cryptoLib = require('crypto');
 const crypto = require("libp2p-crypto");
 const secp256k1 = crypto.keys.supportedKeys.secp256k1;
 
@@ -203,6 +204,10 @@ ipcMain.on("import_wallet", async (evt, arg) => {
     evt.returnValue = { error: true, message: res.error };
   }
 });
+
+ipcMain.on("sha256", (evt, arg) => {
+  evt.returnValue = "0x"+cryptoLib.createHash('sha256').update(arg).digest('hex');
+})
 
 ipcMain.on("load_settings", async (evt, arg) => {
   let destinationSettings =

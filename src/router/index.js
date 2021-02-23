@@ -6,7 +6,9 @@ import WalletPanel from "../views/WalletPanel.vue";
 import ExplorerView from "../views/Explorer.vue";
 import SettingsView from "../views/Settings.vue";
 import IntroView from "../views/Intro.vue";
-
+import ExplorerViewList from "../views/ExplorerList.vue"
+import ExplorerViewNode from "../views/ExplorerNode.vue"
+import ExplorerSearch from "../views/ExplorerSearch.vue"
 Vue.use(VueRouter);
 
 const routes = [
@@ -31,9 +33,26 @@ const routes = [
         component: WalletPanel,
       },
       {
-        path: "explorer",
+        path: "/explorer",
         name: "explorer",
         component: ExplorerView,
+        children: [
+          {
+            path: "/explorer",
+            component: ExplorerViewList,
+            name: "ExplorerViewList"
+          },
+          {
+            path: "/explorer/:hash",
+            component: ExplorerViewNode,
+            name: "ExplorerViewNode"
+          },
+          {
+            path: "/explorer/search/query/",
+            component: ExplorerSearch,
+            name: "ExplorerSearch"
+          }
+        ]
       },
       {
         path: "settings",
@@ -45,7 +64,7 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  mode: process.env.IS_ELECTRON ? "hash" : "history",
+  mode: "history",
   base: process.env.BASE_URL,
   routes,
 });

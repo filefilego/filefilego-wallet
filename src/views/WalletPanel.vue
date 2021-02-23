@@ -107,7 +107,7 @@
                       addressFromKeyname(selected_wallet_status.address)
                   "
                   v-for="(transaction, i) in pending_txs"
-                  :key="i"
+                  :key="'pending_'+i"
                 >
                   <td>
                     <div uk-grid>
@@ -145,7 +145,7 @@
                   </td>
                 </tr>
 
-                <tr v-for="(transaction, i) in transactions" :key="i">
+                <tr v-for="(transaction, i) in transactions" :key="'tx_'+i">
                   <td>
                     <div uk-grid>
                       <div
@@ -492,13 +492,6 @@ export default {
     clearInterval(this.refreshInterval);
   },
   mounted() {
-    // let bts = Buffer.from(
-    //   ks.DecodeHex(
-    //     "9c1e92a50dc7e13265255f7388926ab8a9310d14359045561bce6ca0db8fc5f2"
-    //   )
-    // );
-    // console.log(bts.toString("base64"));
-
     this.errorAddr = "";
     this.amountError = "";
     this.feesError = "";
@@ -628,6 +621,7 @@ export default {
           TransactionFees: feesHex,
           Signature: "",
           Hash: "",
+          Chain: "0x01"
         };
 
         let signedTx = ipcRenderer.sendSync("sign_transaction", tx);
@@ -664,7 +658,6 @@ export default {
 
         // { error: {code: -32000, message: "a transaction with the same nounce is already in mempool" }}}
 
-        console.log(rawRes.data);
       } catch (e) {
         console.log(e.message);
       } finally {

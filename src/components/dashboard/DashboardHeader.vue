@@ -25,6 +25,10 @@
       style="font-size:2em; vertical-align:middle; margin-right:10px; color:#3e15ca; margin-top:12px; margin-left:10px;"
     ></span>
 
+    <span @click="goBack" v-show="enable_back" class="clickable icon-arrow-left2" style="z-index: 99999999; display:inline-block; margin-top:10px; margin-left:10px; cursor: pointer; border: 1px solid; border-radius: 50%; padding: 5px; vertical-align: middle; font-size: 1.3em;" title="" aria-expanded="false"></span>
+    
+    <span v-show="channel_view && !this.selected_wallet_status.unlocked" style="display:inline-block; margin-top:10px; margin-left:10px; padding: 5px; vertical-align: middle; font-size:1.5em; color:red;" class="icon-warning clickable"></span>
+
     <div
       style="z-index: 99999999; position: fixed; right: 4px; top: 2px; margin-right: 8px; margin-top: 0px; "
     >
@@ -55,15 +59,52 @@
 <script>
 const { ipcRenderer } = window.require("electron");
 export default {
+  data() {
+    return {
+      channel_view: false,
+      enable_back: false
+    }
+  },
   computed: {
+    entryMode() {
+      return this.$store.state.entryMode;
+    },
     user() {
       return "user";
     },
     loading_wallet() {
       return this.$store.state.loading_wallet;
     },
+    selected_wallet_status() {
+      return this.$store.state.selected_wallet_status;
+    }
+  },
+  watch: {
+    "$route": function(val) {
+
+      if(val && (val.name == "ExplorerViewNode") || val.name == "ExplorerSearch" || val.name == "ExplorerViewList") {
+        this.channel_view = true
+      } else {
+        this.channel_view = false
+      }
+
+
+      if(val && (val.name == "ExplorerViewNode") || val.name == "ExplorerSearch") {
+        this.enable_back = true
+      } else {
+        this.enable_back = false
+      }
+    }
   },
   methods: {
+    goBack() {
+      if(this.entryMode) {
+        this.$store.dispatch("SetEntryMode", false);
+        return
+      }
+      
+      this.$router.go(-1)
+    },
     closeApp() {
       ipcRenderer.send("close-me");
     },

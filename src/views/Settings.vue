@@ -39,19 +39,16 @@
       ><br />
     </div>
 
-
     <div style="margin-top:10px;">
       <div class="uk-margin">
-        <pre>{{blockchain_settings}}</pre>
+        <pre>{{ blockchain_settings }}</pre>
       </div>
     </div>
-
-    
   </div>
 </template>
 
 <script>
-import axios from "axios"
+import axios from "axios";
 const { ipcRenderer } = window.require("electron");
 export default {
   data() {
@@ -83,16 +80,22 @@ export default {
         this.$store.dispatch("SetSettings", settings);
 
         try {
-          const res = await axios.post(this.rpcEndpoint, {"jsonrpc": "2.0", "method": "ffg_settings", "params": [], "id": 1});
+          const res = await axios.post(this.rpcEndpoint, {
+            jsonrpc: "2.0",
+            method: "ffg_settings",
+            params: [],
+            id: 1,
+          });
           this.$store.dispatch("SetBlockchainSettings", res.data.result);
         } catch (e) {
           // error
-          if(e.name == 'NetworkError'){
-            this.$store.dispatch("SetFetchBlockchainInfoError", "Error while connecting to the RPC server. Please make sure you are connected to internet.");      
-
+          if (e.name == "NetworkError") {
+            this.$store.dispatch(
+              "SetFetchBlockchainInfoError",
+              "Error while connecting to the RPC server. Please make sure you are connected to internet."
+            );
           }
         }
-
 
         ipcRenderer.sendSync("save_settings", settings);
         window.UIkit.notification({

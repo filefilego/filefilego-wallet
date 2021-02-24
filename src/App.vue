@@ -73,7 +73,7 @@ export default {
   },
   mounted() {},
   watch: {
-    blockchainVersion: function (val) {
+    blockchainVersion: function(val) {
       if (val.blockchain_version != this.walletv) {
         window.UIkit.modal(this.$refs.new_version).show();
       }

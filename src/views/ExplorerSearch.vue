@@ -10,29 +10,71 @@
         </h4>
       </div>
       <div class="uk-width-auto uk-text-right">
-       <!-- placeholder -->
+        <!-- placeholder -->
       </div>
     </div>
     <div>
       <div style="padding-top:20px;" class="uk-text-center">
+        <div class="">
+          <label
+            ><input
+              v-model="searchType"
+              class="uk-radio"
+              type="radio"
+              name="radio2"
+              value="1"
+              checked
+            />
+            Match all words
+          </label>
+          <label
+            ><input
+              v-model="searchType"
+              class="uk-radio"
+              type="radio"
+              name="radio2"
+              value="2"
+            />
+            Match any word
+          </label>
+          <label
+            ><input
+              v-model="searchType"
+              class="uk-radio"
+              type="radio"
+              name="radio2"
+              value="3"
+            />
+            Exact match
+          </label>
+        </div>
 
-
-          <div class="">
-              <label><input v-model="searchType" class="uk-radio" type="radio" name="radio2" value="1" checked> Match all words </label>
-              <label><input v-model="searchType" class="uk-radio" type="radio" name="radio2" value="2"> Match any word </label>
-              <label><input v-model="searchType" class="uk-radio" type="radio" name="radio2" value="3"> Exact match </label>
-          </div>
-
-          
-          <div style="width:60%;" class="uk-search uk-search-default">
-              <span uk-search-icon></span>
-              <input id="searchinpt" @keypress.enter="submit" v-model="query" class="uk-search-input" type="search" placeholder="Search...">
-          </div>
-          <button @click="submit" style="background-color:#2c0fcd; color:white;" class="uk-button uk-button-default">Search</button>
+        <div style="width:60%;" class="uk-search uk-search-default">
+          <span uk-search-icon></span>
+          <input
+            id="searchinpt"
+            @keypress.enter="submit"
+            v-model="query"
+            class="uk-search-input"
+            type="search"
+            placeholder="Search..."
+          />
+        </div>
+        <button
+          @click="submit"
+          style="background-color:#2c0fcd; color:white;"
+          class="uk-button uk-button-default"
+        >
+          Search
+        </button>
       </div>
     </div>
 
-    <div v-show="nodes.length == 0 && !loading" class="uk-text-center" style="padding-top:20px;">
+    <div
+      v-show="nodes.length == 0 && !loading"
+      class="uk-text-center"
+      style="padding-top:20px;"
+    >
       <div
         style="background-color:#fff; border-radius:50%; border:2px solid #3e15ca; width:120px; height:120px; text-align:center; margin:0 auto;"
       >
@@ -59,10 +101,19 @@
       </div>
 
       <div style="width:70%; margin:0 auto;">
-        <p v-if="submited" class="med-text" style="color:black; font-weight:bold; font-size:1.1em; margin-top:20px;">
-           <span class="icon-notification"></span> No results found for your search query. Please try something else
+        <p
+          v-if="submited"
+          class="med-text"
+          style="color:black; font-weight:bold; font-size:1.1em; margin-top:20px;"
+        >
+          <span class="icon-notification"></span> No results found for your
+          search query. Please try something else
         </p>
-        <p v-else class="med-text" style="color:black; font-weight:bold; font-size:1.1em; margin-top:20px;">
+        <p
+          v-else
+          class="med-text"
+          style="color:black; font-weight:bold; font-size:1.1em; margin-top:20px;"
+        >
           Your search results will be available here
         </p>
       </div>
@@ -138,12 +189,12 @@
               <div style="vertical-align: middle">
                 <router-link
                   style="font-weight: bold"
-                  :to="'/explorer/'+ch.Hash"
+                  :to="'/explorer/' + ch.Hash"
                   >{{ ch.Name }}</router-link
                 >
-                <div style="font-size: 0.9em; padding: 0; margin: 0">
+                <!-- <div style="font-size: 0.9em; padding: 0; margin: 0">
                   {{ ch.Description }}
-                </div>
+                </div> -->
               </div>
             </td>
             <td style="vertical-align: middle; text-align:right;">
@@ -152,7 +203,6 @@
           </tr>
         </tbody>
       </table>
-
     </div>
   </div>
 </template>
@@ -163,24 +213,24 @@ import axios from "axios";
 export default {
   data() {
     return {
-        searchType: 1,
-        query: "",
-        nodes: [],
-        loading: false,
-        submited: false,
+      searchType: 1,
+      query: "",
+      nodes: [],
+      loading: false,
+      submited: false,
     };
   },
   async mounted() {
     let q = this.$route.query.query || -1;
-        if(q == -1) {
-          this.query = "";
-          this.submited = false;
-          this.nodes = []
-        } else {
-          this.query = q;
-          this.search()
-        }
-      document.getElementById("searchinpt").focus()
+    if (q == -1) {
+      this.query = "";
+      this.submited = false;
+      this.nodes = [];
+    } else {
+      this.query = q;
+      this.search();
+    }
+    document.getElementById("searchinpt").focus();
   },
   computed: {
     selected_wallet_status() {
@@ -194,39 +244,39 @@ export default {
     },
   },
   methods: {
-      submit() {
-        this.$router.push("/explorer/search/query/?query=" + this.query)
-      },
-      async search() {
-        this.loading = true
-        const rawRes = await axios.post(this.rpcEndpoint, {
-          jsonrpc: "2.0",
-          method: "channel_search",
-          params: [this.query, parseInt(this.searchType), 100],
-          id: 1,
-        });
+    submit() {
+      this.$router.push("/explorer/search/query/?query=" + this.query);
+    },
+    async search() {
+      this.loading = true;
+      const rawRes = await axios.post(this.rpcEndpoint, {
+        jsonrpc: "2.0",
+        method: "channel_search",
+        params: [this.query, parseInt(this.searchType), 100],
+        id: 1,
+      });
 
-        if(rawRes.data.result) {
-          this.nodes = [...rawRes.data.result];
-          this.submited = false;
-        } else {
-          this.submited = true;
-          this.nodes = [];
-        }
-        this.loading = false
+      if (rawRes.data.result) {
+        this.nodes = [...rawRes.data.result];
+        this.submited = false;
+      } else {
+        this.submited = true;
+        this.nodes = [];
       }
+      this.loading = false;
+    },
   },
   watch: {
-    $route: async function (val) {
+    $route: async function(val) {
       if (val && val.name == "ExplorerSearch") {
         let q = this.$route.query.query || -1;
-        if(q == -1) {
-          this.query = ""
-          this.submited = false
-          this.nodes = []
+        if (q == -1) {
+          this.query = "";
+          this.submited = false;
+          this.nodes = [];
         } else {
           this.query = q;
-          this.search()
+          this.search();
         }
       }
     },
@@ -235,7 +285,8 @@ export default {
 </script>
 
 <style>
-.uk-input, .uk-search-input {
+.uk-input,
+.uk-search-input {
   border: 1px solid #e7e7e7 !important;
 }
 </style>

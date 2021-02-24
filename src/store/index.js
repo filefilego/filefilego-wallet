@@ -25,8 +25,8 @@ export default new Vuex.Store({
       namespace_enabled: true,
       namespace_registration_fee: "10000000000000000000000",
       node_creation_fees_guest: "",
-      verifiers: []
-    }
+      verifiers: [],
+    },
   },
   mutations: {
     SetFetchBlockchainInfoError(state, val) {

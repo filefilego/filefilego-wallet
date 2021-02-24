@@ -14,8 +14,6 @@ var jspb = require('google-protobuf');
 var goog = jspb;
 var global = Function('return this')();
 
-var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
-goog.object.extend(proto, google_protobuf_timestamp_pb);
 goog.exportSymbol('proto.node.AddressState', null, global);
 goog.exportSymbol('proto.node.Block', null, global);
 goog.exportSymbol('proto.node.BlockQuery', null, global);
@@ -2962,12 +2960,13 @@ proto.node.TransactionDataPayloadType = {
  * @enum {number}
  */
 proto.node.ChanNodeType = {
-  FILE: 0,
-  DIR: 1,
-  CHANNEL: 2,
-  SUBCHANNEL: 3,
-  ENTRY: 4,
-  OTHER: 5
+  INVALIDNODE: 0,
+  FILE: 1,
+  DIR: 2,
+  CHANNEL: 3,
+  SUBCHANNEL: 4,
+  ENTRY: 5,
+  OTHER: 6
 };
 
 /**

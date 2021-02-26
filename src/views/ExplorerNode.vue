@@ -63,6 +63,25 @@
             v-model="entry_content"
           />
         </div>
+        <new-button :cnode="node.node" />
+
+        <div>
+
+          <ul>
+            <li v-for="(u, idx) in upload_data" :key="'up'+idx">
+              {{u.name}} <span @click="removeItemFromUpload(idx)"> x </span>
+            </li>
+          </ul>
+
+          <span>confilicts</span>
+          <ul>
+            <li v-for="(u, idx) in name_conflicts" :key="'up'+idx">
+              {{u.name}} <span @click="removeItemFromConflicts(idx)"> x </span>
+            </li>
+          </ul>
+
+        </div>
+
         <div class="uk-margin uk-text-center" style="padding: 15px">
           <button
             @click="createEntry"
@@ -698,11 +717,15 @@
 import axios from "axios";
 import unitUtil from "../units";
 import ftype from '../common/filetypes'
+import NewButton from "../components/NewButton"
 const BN = require("bn.js");
 var messages = require("../messages_pb");
 const { ipcRenderer } = window.require("electron");
 
 export default {
+  components: {
+    NewButton
+  },
   data() {
     return {
       toolbarOptions: {
@@ -768,8 +791,20 @@ export default {
     blockchain_settings() {
       return this.$store.state.blockchain_settings;
     },
+    upload_data() {
+      return this.$store.state.upload_data;
+    },
+    name_conflicts() {
+      return this.$store.state.name_conflicts;
+    }
   },
   methods: {
+    removeItemFromUpload(idx) {
+      this.$store.dispatch("RemoveUploadData", idx)
+    },
+    removeItemFromConflicts(idx) {
+      this.$store.dispatch("RemoveItemFromConflicts", idx)
+    },
     nodeVector(node) {
         let img = `/file_types/${ftype.getVectorOf(ftype.getExt(node.Name))}.svg`;
         console.log(img);
@@ -921,14 +956,17 @@ export default {
       return this.colors[idx];
     },
     openNewFolderModal() {
+      this.channel_creation_error = "";
       window.UIkit.modal(this.$refs.create_folder).show();
       UIkit.dropdown(document.getElementById("new_dropdown")).hide();
     },
     openSubchannelModal() {
+      this.channel_creation_error = "";
       window.UIkit.modal(this.$refs.create_node).show();
       UIkit.dropdown(document.getElementById("new_dropdown")).hide();
     },
     openEntryModal() {
+      this.channel_creation_error = "";
       this.entry_content = "";
       this.entry_name = "";
       this.$store.dispatch("SetEntryMode", true);

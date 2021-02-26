@@ -5,8 +5,12 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    // Uploading stuff
+    upload_data: [],
+    name_conflicts: [],
+    //
     entryMode: false,
-    wallet_compatible_version: "0.5.1",
+    wallet_compatible_version: "0.9.2",
     fetch_blockchain_info_error: false,
     rpc_endpoint: "http://rpc.filefilego.com:8090/",
     wallets: [],
@@ -29,6 +33,24 @@ export default new Vuex.Store({
     },
   },
   mutations: {
+    AddToUploadData(state, val) {
+      let isConflict =
+        state.upload_data.filter((o) => o.name == val.name).length > 0;
+      if (isConflict) {
+        state.name_conflicts.push(val);
+      } else {
+        state.upload_data.push(val);
+      }
+    },
+    SetUploadData(state, val) {
+      state.upload_data = [...val];
+    },
+    RemoveUploadData(state, index) {
+      state.upload_data.splice(index, 1);
+    },
+    RemoveItemFromConflicts(state, index) {
+      state.name_conflicts.splice(index, 1);
+    },
     SetFetchBlockchainInfoError(state, val) {
       state.fetch_blockchain_info_error = val;
     },
@@ -61,6 +83,18 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    AddToUploadData(context, payload) {
+      context.commit("AddToUploadData", payload);
+    },
+    SetUploadData(context, payload) {
+      context.commit("SetUploadData", payload);
+    },
+    RemoveUploadData(context, payload) {
+      context.commit("RemoveUploadData", payload);
+    },
+    RemoveItemFromConflicts(context, payload) {
+      context.commit("RemoveItemFromConflicts", payload);
+    },
     SetEntryMode(context, payload) {
       context.commit("SetEntryMode", payload);
     },

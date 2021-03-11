@@ -9,8 +9,6 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 const path = require("path");
 const fs = require("fs");
 const cryptoLib = require("crypto");
-const crypto = require("libp2p-crypto");
-const secp256k1 = crypto.keys.supportedKeys.secp256k1;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

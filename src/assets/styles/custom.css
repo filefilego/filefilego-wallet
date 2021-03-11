@@ -318,3 +318,11 @@ a {
 .ffg-main-button:hover {
   background-color: #2600ff !important;
 }
+
+
+.uk-input,
+.uk-search-input {
+  border: 1px solid #e7e7e7 !important;
+  background-color:#fff !important;
+}
+

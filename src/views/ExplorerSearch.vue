@@ -285,8 +285,4 @@ export default {
 </script>
 
 <style>
-.uk-input,
-.uk-search-input {
-  border: 1px solid #e7e7e7 !important;
-}
 </style>

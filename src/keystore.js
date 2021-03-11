@@ -78,7 +78,6 @@ const NewKeyAndStoreToPathAndReturnJSON = async (pass, pathToSave) => {
   let key = await NewKeypair();
   let jsonKey = await MarshalKey(key, pass);
   let fname = PrepareKeyFilename("0x" + jsonKey.address);
-  console.log(fname);
   fs.writeFileSync(pathToSave + fname, JSON.stringify(jsonKey, null, 2));
   return { key: jsonKey, file_name: fname };
 };

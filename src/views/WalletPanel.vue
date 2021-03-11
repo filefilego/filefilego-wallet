@@ -652,13 +652,9 @@ export default {
         this.destination_address = "";
         this.amount = "";
         this.fees = "";
-        // everything is ok, put it recent transactions
 
-        //  { result: "0x9c1e92a50dc7e13265255f7388926ab8a9310d14359045561bce6ca0db8fc5f2" ... }
-
-        // { error: {code: -32000, message: "a transaction with the same nounce is already in mempool" }}}
       } catch (e) {
-        console.log(e.message);
+        //
       } finally {
         this.loading_sendcoin = false;
       }
@@ -691,7 +687,6 @@ export default {
         });
         this.transactions = [...res.data.result];
       } catch (e) {
-        // console.log(e);
         if (e.message == "Network Error") {
           this.offline = true;
         }

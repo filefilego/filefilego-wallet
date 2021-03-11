@@ -7,11 +7,21 @@ import UIkit from "uikit";
 import "@/assets/styles/styles.scss";
 import Icons from "uikit/dist/js/uikit-icons";
 import VueQuillEditor from "vue-quill-editor";
-const { ipcRenderer } = window.require("electron");
+import filesize from "filesize";
 
 import "quill/dist/quill.core.css"; // import styles
 import "quill/dist/quill.snow.css"; // for snow theme
 import "quill/dist/quill.bubble.css"; // for bubble theme
+const { ipcRenderer } = window.require("electron");
+
+const BN = require("bn.js");
+
+Vue.filter("formatsize", (val) => {
+  if (!val) return "-";
+  if (typeof val == "number") return filesize(val);
+  let v = new BN(val.slice(2), 16).toNumber();
+  return filesize(v);
+});
 
 Vue.use(VueQuillEditor /* { default global options } */);
 

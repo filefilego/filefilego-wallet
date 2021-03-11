@@ -355,6 +355,7 @@ export default {
       return unitUtil.fromAran(amount.toString(10), to).toString(10);
     },
     async createChannel() {
+      this.channel.name = this.channel.name.trim();
       this.channel_creation_error = "";
       if (this.channel.name == "") {
         this.channel_creation_error = "Channel name is required";
@@ -406,7 +407,6 @@ export default {
         );
 
         let requiredBalance = regTotal.add(txFee);
-        // console.log(balance, balanceFinal);
         if (balance.lt(requiredBalance)) {
           this.channel_creation_error =
             "* Channel creation requires " +
@@ -566,7 +566,5 @@ export default {
 </script>
 
 <style>
-.uk-input {
-  border: 1px solid #e7e7e7;
-}
+
 </style>

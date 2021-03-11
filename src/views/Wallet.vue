@@ -23,7 +23,7 @@
           @click="openNewWalletDialog()"
           type="button"
           class="uk-button uk-button-default"
-          style="border-radius: 3px;width: 170px;line-height: 30px;height: 35px;background-color: #4a07c2; color: rgb(255, 255, 255);border: 1px solid #180141;font-weight: bold;padding: 0px;"
+          style="border-radius: 3px; width: 170px; line-height: 30px; height: 35px; background-color: #2c0fcd; color: rgb(255, 255, 255); border: 1px solid #180141; font-weight: bold; padding: 0px;"
         >
           <span class="icon-plus" style="margin-right:10px;"></span> New Wallet
         </button>
@@ -552,10 +552,7 @@ export default {
         if (!result.canceled) {
           let destinationFile = result.filePaths[0];
           this.selected_keystore_file_import = destinationFile;
-          // console.log(destinationFile);
-          // ipcRenderer.send("import_wallet", {
-          //   destination: destinationFile,
-          // });
+          
         }
       });
     },

@@ -1,17 +1,115 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import queue from "queue";
+import axios from "axios";
+import uploader from "../common/uploader";
+
+let filesQueue = queue();
+filesQueue.concurrency = 4;
+filesQueue.autostart = false;
 
 Vue.use(Vuex);
+
+const asyncFunctionFactory = (store, item) => {
+  return () => {
+    /* eslint-disable no-async-promise-executor */
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (item.canceled) return resolve("CANCELED");
+
+        if (item.type == "dir") {
+          let size = 0,
+            totalSize = 0;
+
+          for (let i = 0; i < item.files.length; i++) {
+            item.cancel = axios.CancelToken.source();
+            if (!("file" in item.files[i])) continue;
+            let formData = new FormData();
+            formData.append("file", item.files[i].file);
+            formData.append("node_hash", item.files[i].hash);
+
+            let result = await uploader.uploadData(
+              store.state.binlayer.endpoint,
+              store.state.binlayer.authtoken,
+              formData,
+              item.cancel,
+              (progressEvent) => {
+                size = Number(progressEvent.loaded);
+                item.progress = Number(totalSize + progressEvent.loaded);
+              }
+            );
+
+            if (!result.success) {
+              item.error = result.data.error;
+              break;
+              // problem uploading
+              // record it
+            } else {
+              item.files[i].file_hash = result.data.file_hash;
+              size = Number(item.files[i].file.size);
+            }
+
+            totalSize += size;
+          }
+          item.progress = totalSize;
+        } else {
+          // single file
+          item.cancel = axios.CancelToken.source();
+          let formData = new FormData();
+          formData.append("file", item.file.file);
+          formData.append("node_hash", item.file.hash);
+
+          let result = await uploader.uploadData(
+            store.state.binlayer.endpoint,
+            store.state.binlayer.authtoken,
+            formData,
+            item.cancel,
+            (progressEvent) => {
+              item.progress = Number(progressEvent.loaded);
+            }
+          );
+
+          if (!result.success) {
+            item.error = result.data.error;
+          } else {
+            item.file.file_hash = result.data.file_hash;
+            item.progress = item.file.file.size;
+          }
+        }
+
+        if (filesQueue.length <= 1) {
+          store.commit("StopUploadQueue");
+        }
+
+        resolve("success");
+      } catch (e) {
+        if (filesQueue.length <= 1) {
+          store.commit("StopUploadQueue");
+        }
+
+        item.error = e.message;
+        reject(e);
+      }
+    });
+  };
+};
 
 export default new Vuex.Store({
   state: {
     // Uploading stuff
     upload_data: [],
     name_conflicts: [],
+    file_queue_started: false,
+    after_upload: { type: "", cb: null },
+    current_node_upload: {},
     //
     entryMode: false,
-    wallet_compatible_version: "0.9.2",
+    wallet_compatible_version: "0.9.3",
     fetch_blockchain_info_error: false,
+    binlayer: {
+      endpoint: "http://localhost:8090/uploads",
+      authtoken: "1234",
+    },
     rpc_endpoint: "http://rpc.filefilego.com:8090/",
     wallets: [],
     selected_wallet_status: { unlocked: false },
@@ -33,6 +131,9 @@ export default new Vuex.Store({
     },
   },
   mutations: {
+    SetCurrentNodeUpload(state, val) {
+      state.current_node_upload = { ...val };
+    },
     AddToUploadData(state, val) {
       let isConflict =
         state.upload_data.filter((o) => o.name == val.name).length > 0;
@@ -40,6 +141,12 @@ export default new Vuex.Store({
         state.name_conflicts.push(val);
       } else {
         state.upload_data.push(val);
+        filesQueue.push(
+          asyncFunctionFactory(
+            this,
+            state.upload_data[state.upload_data.length - 1]
+          )
+        );
       }
     },
     SetUploadData(state, val) {
@@ -47,6 +154,11 @@ export default new Vuex.Store({
     },
     RemoveUploadData(state, index) {
       state.upload_data.splice(index, 1);
+    },
+    CancelUploadData(state, index) {
+      state.upload_data[index].canceled = true;
+      if (state.upload_data[index].cancel)
+        state.upload_data[index].cancel.cancel();
     },
     RemoveItemFromConflicts(state, index) {
       state.name_conflicts.splice(index, 1);
@@ -81,8 +193,31 @@ export default new Vuex.Store({
     SetBlockchainSettings(state, sts) {
       state.blockchain_settings = { ...sts };
     },
+    StartUploadQueue(state, payload) {
+      state.file_queue_started = true;
+      filesQueue.start();
+      state.after_upload = payload;
+    },
+    StopUploadQueue(state) {
+      state.file_queue_started = false;
+      filesQueue.stop();
+
+      // go through all the data
+      if (state.after_upload.cb != null) {
+        state.after_upload.cb();
+      }
+    },
   },
   actions: {
+    SetCurrentNodeUpload(context, payload) {
+      context.commit("SetCurrentNodeUpload", payload);
+    },
+    StartUploadQueue(context, payload) {
+      context.commit("StartUploadQueue", payload);
+    },
+    StopUploadQueue(context) {
+      context.commit("StopUploadQueue");
+    },
     AddToUploadData(context, payload) {
       context.commit("AddToUploadData", payload);
     },
@@ -91,6 +226,9 @@ export default new Vuex.Store({
     },
     RemoveUploadData(context, payload) {
       context.commit("RemoveUploadData", payload);
+    },
+    CancelUploadData(context, payload) {
+      context.commit("CancelUploadData", payload);
     },
     RemoveItemFromConflicts(context, payload) {
       context.commit("RemoveItemFromConflicts", payload);

@@ -11,13 +11,13 @@ const uploadData = async (
       cancelToken: cancelToken.token,
       headers: {
         "Content-Type": "multipart/form-data",
-        Authorization: `basic ${authtoken}`,
+        Authorization: `${authtoken}`,
       },
       onUploadProgress: progresscb,
     });
-    return result.data;
+    return { success: true, data: result.data };
   } catch (e) {
-    return false;
+    return { success: false, data: e.response.data };
   }
 };
 

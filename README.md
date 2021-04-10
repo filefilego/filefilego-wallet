@@ -1,29 +1,8 @@
-# filefilego-wallet
+# FileFileGo Wallet
 
-## Project setup
-```
-npm install
-```
+This is the official wallet implementation of FileFileGo network and protocols. This wallet supports the following features:
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+* Wallet functionality to send and receive coins
+* Explorer to search and discover data within the network
+* Downloader to manage downloads from the network
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

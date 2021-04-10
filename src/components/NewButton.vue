@@ -71,6 +71,7 @@ export default {
       splits.forEach((val, index) => {
         let obj = {
           file_hash: "",
+          merkle_root: "",
           parentHash: lastHash,
           hash: ipcRenderer.sendSync("sha256", lastHash + val),
           name: val,
@@ -94,6 +95,7 @@ export default {
           name: e.target.files[i].name,
           file: {
             file_hash: "",
+            merkle_root: "",
             parentHash: this.cnode.Hash,
             hash: ipcRenderer.sendSync(
               "sha256",

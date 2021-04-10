@@ -40,12 +40,14 @@ const asyncFunctionFactory = (store, item) => {
             );
 
             if (!result.success) {
-              item.error = result.data.error;
-              break;
+              // item.error = result.data.error;
               // problem uploading
               // record it
             } else {
               item.files[i].file_hash = result.data.file_hash;
+              item.files[i].merkle_root = Uint8Array.from(
+                Buffer.from(result.data.merkle_root, "hex")
+              );
               size = Number(item.files[i].file.size);
             }
 
@@ -70,9 +72,12 @@ const asyncFunctionFactory = (store, item) => {
           );
 
           if (!result.success) {
-            item.error = result.data.error;
+            // item.error = result.data.error;
           } else {
             item.file.file_hash = result.data.file_hash;
+            item.file.merkle_root = Uint8Array.from(
+              Buffer.from(result.data.merkle_root, "hex")
+            );
             item.progress = item.file.file.size;
           }
         }

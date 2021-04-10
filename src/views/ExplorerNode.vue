@@ -450,7 +450,7 @@
                         
                       "
                       >
-                        {{ ch.Name | firstletter }}
+                      {{ ch.Name | firstletter }}
                       </div>
                       <span
                         v-if="ch.NodeType == 2"
@@ -465,6 +465,7 @@
                     </td>
                     <td>
                       <div style="vertical-align: middle">
+                        
                         <router-link
                           style="font-weight: bold"
                           :to="{
@@ -479,7 +480,20 @@
                       </div>
                     </td>
                     <td style="vertical-align: middle; text-align:right;">
-                      <div>{{ ch.Timestamp | timestamptodate }}</div>
+                      <div style=""> 
+                        <!-- <span @click="checkDataQueryResult(resultID)" style="color:blue;" class="clickable icon-list"></span>  <span @click="searchForNode(ch.Hash)" style="color:green;" class="clickable icon-search"></span> -->
+                        
+                        <span style="vertical-align:middle;">
+                         {{ ch.Timestamp | timestamptodate }}
+                        </span>
+
+                        <div @click="openSearchProviderModal(ch)" style="cursor:pointer; margin-left:7px; display:inline-block; width:32px; height:32px; border-radius:50%; background-color:#e1e1e1; vertical-align:middle;  text-align:center;">
+                          <span style="color:#3e15ca; font-size:1.2em; vertical-align:middle;" class="icon-download3"></span>
+                        </div>
+                        <!-- <div v-for="h in resultHosters" :key="h.FromPeerAddr">
+                          fees {{h.TotalFeesRequired}}  <span @click="prepareContract(h.TotalFeesRequired, h.Hash, h.FromPeerAddr)" style="color:green;" class="clickable icon-download"></span>
+                        </div> -->
+                      </div>
                     </td>
                   </tr>
                   <tr v-if="data.length == 0">
@@ -1022,6 +1036,146 @@
         </div>
       </div>
     </div>
+
+
+    <div ref="search_providers" class="uk-modal" uk-modal="bg-close:false;">
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <button
+          class="uk-modal-close-default"
+          style="left: 5px; top: 15px; right: 0px"
+          type="button"
+          uk-close
+        ></button>
+        <div class="uk-modal-header">
+          <h2 style="font-size: 1.1em" class="uk-modal-title header-display-1">
+            Finding providers
+          </h2>
+        </div>
+        <div style="padding: 0" class="uk-modal-body">
+          <div
+            v-show="!loadingProviders"
+            class="uk-text-center"
+            style="padding: 15px"
+          >
+            <div style="margin-top: 15px; padding-bottom:20px;">
+
+              <div v-if="resultHosters.length == 0">
+                <h2 style="font-size: 1.1em" class="uk-modal-title header-display-1">
+                  <span class="icon-info"></span> Provider not available for your selection
+                </h2>
+                <span>
+                  Please try again later, provider nodes might be currently offline
+                </span>
+              </div>
+              <div v-else> 
+
+                <h2 style="font-size: 1.1em; padding:0px; margin:0px;" class="uk-modal-title header-display-1">
+                  <!-- <span class="icon-checkmark"></span>  -->
+                  Please select a provider:
+                </h2>
+
+                <table style="padding:0px; margin:0px;" class="uk-table uk-table-striped">
+                    <thead>
+                        <tr>
+                            <th>Peer</th>
+                            <th>Cost</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="p in resultHosters" :key="p.FromPeerAddr">
+                            <td style="text-align:left;" class="uk-width-1-4 uk-text-truncate">{{p.FromPeerAddr}}</td>
+                            <td style="text-align:left;" class="uk-width-2-4"><b>{{ HexAmountToAran(p.TotalFeesRequired).slice(0,7)}}</b> Zaran(s)</td>
+                            <td style="text-align:right;" class="uk-width-1-4">
+                               <div @click="prepareContract(p.TotalFeesRequired, p.Hash, p.FromPeerAddr)" uk-tooltip="Download" style="cursor:pointer; margin-left:7px; display:inline-block; width:32px; height:32px; border-radius:50%; background-color:#e1e1e1; vertical-align:middle;  text-align:center;">
+                                <span style="color:#4caf50; font-size:1.2em; vertical-align:middle;" class="icon-download3"></span>
+                              </div>
+                            </td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+
+                <span
+                  
+                  style="color:red; margin-top:8px; display:inline-block;"
+                  >
+                  error
+                  
+                </span>
+
+<!-- 
+                <div uk-grid >
+                  <div style="text-align:left;" class="uk-width-expand">
+                    
+                  </div>
+                  <div style="text-align:right;" class="uk-width-1-4">
+                    Select
+                  </div>
+                </div> -->
+                
+
+                <!-- {{resultHosters}} -->
+              </div>
+
+              <!-- <div class="uk-margin uk-text-center" style="padding: 15px">
+                <button
+                  @click="createFolder()"
+                  type="button"
+                  class="uk-button uk-button-default ffg-main-button"
+                  style="
+                      border-radius: 3px;
+                      width: 170px;
+                      line-height: 30px;
+                      height: 50px;
+                      background-color: #2c0fcd;
+                      color: rgb(255, 255, 255);
+                      border: 1px solid #180141;
+                      font-weight: bold;
+                      padding: 0px;
+                    "
+                >
+                  Create
+                </button>
+                <br />
+
+                <span
+                  v-show="channel_creation_error != ''"
+                  style="color:red; margin-top:8px; display:inline-block;"
+                  >{{ channel_creation_error }}</span
+                >
+                <br />
+              </div> -->
+            </div>
+          </div>
+          <div v-if="loadingProviders">
+            <div style="text-align: center; padding-top:20px;">
+              <div class="lds-roller">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+              <div style="width: 70%; margin: 0 auto">
+                <h4
+                  style="color: rgb(13, 13, 13); padding-bottom: 11px"
+                  class="header-display-1"
+                >
+                  Searching for providers ...
+                </h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
   </div>
 </template>
 
@@ -1084,6 +1238,11 @@ export default {
       data: [],
       node: { node: { NodeType: -1 } },
       loading: false,
+
+      // data query
+      resultID: "",
+      resultHosters: [],
+      loadingProviders: true
     };
   },
   async mounted() {
@@ -1112,6 +1271,129 @@ export default {
     },
   },
   methods: {
+    HexAmountToAran(val) {
+      let amount = new BN(val.slice(2), 16);
+      return unitUtil.fromAran(amount.toString(10), "zaran").toString(10);
+    },
+
+    openSearchProviderModal(ch) {
+      this.resultID = ""
+      this.resultHosters = []
+      this.loadingProviders =  true
+
+      this.searchForNode(ch.Hash)
+      let times = 3;
+      let intVal = setInterval(() => {
+        if(times <= 0) {
+          clearInterval(intVal)
+          this.loadingProviders = false
+          return
+        }
+
+        if(this.resultHosters.length > 0) {
+          clearInterval(intVal)
+          this.loadingProviders = false
+          return
+        }
+
+        times--;
+        if(this.resultID != "") {
+          this.checkDataQueryResult(this.resultID)
+        }
+      }, 1000)
+      window.UIkit.modal(this.$refs.search_providers).show();
+    },
+    async SendContract(amountHex, fees, contractData, verifierAddress) {
+      try {
+        this.error_result = "";
+        let addr = this.addressFromKeyname(this.selected_wallet_status.address);
+        
+        const res = await axios.post(this.rpcEndpoint, {
+          jsonrpc: "2.0",
+          method: "account_balance",
+          params: [addr],
+          id: 1,
+        });
+
+        let feesHex;
+        try {
+          feesHex = "0x" + unitUtil.toAran(fees, "zaran").toString(16);
+        } catch (e) {
+          this.feesError = e.message;
+          return;
+        }
+
+        // this.loading_sendcoin = true;
+
+        let tx = {
+          Nounce: res.data.result.next_nounce,
+          Data: contractData,
+          From: addr,
+          To: verifierAddress,
+          Value: amountHex,
+          TransactionFees: feesHex,
+          Signature: "",
+          Hash: "",
+          Chain: "0x01",
+        };
+
+        let signedTx = ipcRenderer.sendSync("sign_transaction", tx);
+
+        const rawRes = await axios.post(this.rpcEndpoint, {
+          jsonrpc: "2.0",
+          method: "transaction_sendRawTransaction",
+          params: [JSON.stringify(signedTx)],
+          id: 1,
+        });
+
+        if ("error" in rawRes.data) {
+          return;
+        }
+
+      } catch (e) {
+        console.log("Ex ", e)
+      } 
+    },
+    async prepareContract(totalFees, hash, peerID) {
+      const res = await axios.post(this.rpcEndpoint, {
+        jsonrpc: "2.0",
+        method: "channel_prepareDataContract",
+        params: [hash, peerID],
+        id: 1,
+      });
+
+      if (!("error" in res.data)) {
+        // something is there
+        let contractData = res.data.result.HexPayload,
+            verifierAddr = res.data.result.VerifierAddr
+
+        await this.SendContract(totalFees, "0.0001", contractData, verifierAddr )
+      }
+    },
+    async checkDataQueryResult(hash) {
+      const res = await axios.post(this.rpcEndpoint, {
+        jsonrpc: "2.0",
+        method: "channel_dataQueryResult",
+        params: [hash],
+        id: 1,
+      });
+
+      if (!("error" in res.data)) {
+        // something is there
+        this.resultHosters = res.data.result
+      }
+    },
+
+    async searchForNode(hash) {
+      const res = await axios.post(this.rpcEndpoint, {
+        jsonrpc: "2.0",
+        method: "channel_dataQuery",
+        params: [hash],
+        id: 1,
+      });
+
+      this.resultID  = res.data.result 
+    },
     async nextUploadItemsPage() {
       this.entry_name = this.entry_name.trim()
       if(this.entry_name == '') {
@@ -1391,6 +1673,7 @@ export default {
           tmpN.setNodetype(messages.ChanNodeType.FILE);
           tmpN.setParenthash(o.file.parentHash);
           tmpN.setBinlayerhash(o.file.file_hash);
+          tmpN.setMerkleroot(o.file.merkle_root);
           let sizeBig = new BN(o.file.file.size, 10).toString(16);
           tmpN.setSize('0x'+sizeBig);
           chEnvelp.addNodes(tmpN);
@@ -1404,9 +1687,11 @@ export default {
 
             if("file" in j) {
               tmpN.setNodetype(messages.ChanNodeType.FILE);
-              console.log("size in files ", j.file.size)
               let sizeBig = new BN(j.file.size, 10).toString(16);
               tmpN.setSize('0x'+sizeBig);
+              tmpN.setBinlayerhash(j.file_hash);
+              tmpN.setMerkleroot(j.merkle_root);
+              
             } else {
               tmpN.setNodetype(messages.ChanNodeType.DIR);
             }

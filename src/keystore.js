@@ -1,4 +1,4 @@
-import fs from "fs";
+var fs = require("fs");
 var sha256 = require("js-sha256");
 
 var crypto = require("crypto");
@@ -32,6 +32,9 @@ const SignTransaction = async (tx, key) => {
 
   let txData = Buffer.from("");
   if (tx.Data != "") {
+    if (tx.Data.substring(0, 2) == "0x") {
+      tx.Data = tx.Data.substring(2);
+    }
     txData = DecodeHex(tx.Data);
     tx.Data = "0x" + tx.Data;
   }

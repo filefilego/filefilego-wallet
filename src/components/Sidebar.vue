@@ -66,6 +66,18 @@
         </li>
       </router-link>
 
+      <router-link to="/downloads">
+        <li
+          class="uk-text-center main-sidebar-item"
+          style="font-size: 1em; padding-left: 12px; padding: 12px;"
+        >
+          <span style="font-size:1.7em;" class="icon-box-add"></span>
+          <div>Downloads</div>
+        </li>
+      </router-link>
+
+
+
       <router-link to="/settings">
         <li
           class="uk-text-center main-sidebar-item"

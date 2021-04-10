@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import WalletView from "../views/Wallet.vue";
 import WalletPanel from "../views/WalletPanel.vue";
+import DownloadView from "../views/DownloadView.vue";
 import ExplorerView from "../views/Explorer.vue";
 import SettingsView from "../views/Settings.vue";
 import IntroView from "../views/Intro.vue";
@@ -53,6 +54,11 @@ const routes = [
             name: "ExplorerSearch",
           },
         ],
+      },
+      {
+        path: "downloads",
+        name: "DownloadView",
+        component: DownloadView,
       },
       {
         path: "settings",

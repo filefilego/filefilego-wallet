@@ -8,7 +8,10 @@
         Attach files/folders by using the following:
       </h4>
 
-    <div class="uk-active">
+      <div style="color:red;" v-if="!binlayerEnabled">
+        This node doesn't support uploading files functionality. However you can create an entry without files attached!
+      </div>
+    <div v-if="binlayerEnabled" class="uk-active">
 
       <span>
         <span style="color:black; font-size: 1.4em;" class="icon-upload"></span>
@@ -56,6 +59,9 @@ export default {
     return {};
   },
   computed: {
+    binlayerEnabled() {
+      return this.$store.state.blockchain_settings.binlayer_engine_enabled;
+    },
     cnode() {
       return this.$store.state.current_node_upload;
     }

@@ -63,7 +63,56 @@
     </div>
 
     <div v-show="!loading" style="padding-top: 20px">
-      <table class="uk-table uk-table-divider">
+
+      <div class="uk-text-center" v-if="channels.length == 0">
+        <h4
+          v-if="loadingChannelError"
+          style="color: rgb(13, 13, 13); padding-bottom: 11px;"
+          class="header-display-1"
+        >
+          Error while connecting to remote RPC peer
+        </h4>
+
+        <h4
+          v-else
+          style="color: rgb(13, 13, 13); padding-bottom: 11px;"
+          class="header-display-1"
+        >
+          There are no channels registered
+        </h4>
+
+        
+        <div
+          style="background-color:#fff; border-radius:50%; border:2px solid #3e15ca; width:120px; height:120px; text-align:center; margin:0 auto;"
+        >
+        <svg style="vertical-align:middle;"
+                        xmlns="http://www.w3.org/2000/svg"
+                        height="110px"
+                        width="110px"
+                        fill="#3e15ca"
+                        data-name="Layer 1"
+                        viewBox="0 0 100 100"
+                        x="0px"
+                        y="0px"
+                      >
+                        <title> </title>
+                        <path
+                          d="M90,39a4,4,0,0,0-3.86,3H83v8.36l-3.11-3.11L66.38,52.13l-3.17,8.79L54,56.6l-8.62,4,4-8.07-4.53-5.72L51.73,40h5.41a4,4,0,1,0,0-2H50.9l-7.29,7.29-3.14-4-7.34-.17,2.89-8-4.28-4.28L39.63,21H50.14a4,4,0,1,0,0-2H38.81l-8.48,8.48L27,24.15V13H37.14a4,4,0,1,0,0-2H25V24L12.85,28.38,8,41.89l9.66,9.66,3.94-1.42L20,53.24l4.31,5.44L19,64H12.86a4,4,0,1,0,0,2h7l5.74-5.74L29,64.49l12,.27V70H30.86a4,4,0,1,0,0,2H41v4.37l5,2.35V82H37.86a4,4,0,1,0,0,2H48V79.66l6,2.81,6-2.81V87H76.14a4,4,0,1,0,0-2H62V78.72l5-2.35V71.12l4.17,4.17,13.5-4.87,4.88-13.51L85,52.36V44h1.14A4,4,0,1,0,90,39ZM61,37a2,2,0,1,1-2,2A2,2,0,0,1,61,37ZM54,18a2,2,0,1,1-2,2A2,2,0,0,1,54,18ZM41,10a2,2,0,1,1-2,2A2,2,0,0,1,41,10ZM9,67a2,2,0,1,1,2-2A2,2,0,0,1,9,67Zm18,6a2,2,0,1,1,2-2A2,2,0,0,1,27,73Zm7,12a2,2,0,1,1,2-2A2,2,0,0,1,34,85Zm46-1a2,2,0,1,1-2,2A2,2,0,0,1,80,84ZM68,53.69l9.91-3.58L74,59.7l-7.56,2.73L65,61.78ZM65,65.07v1.22l-.9-.9Zm-2.47-2.26L62.1,64l-7.83,3.32L45.06,63,54,58.81Zm-23-19.51L46,51.57l-10.33-.63-4.19-5.29.9-2.5Zm-10-.22.83,0-.26.71Zm-.94,2.41-2.95,1.06,1.34-2.68ZM31,41.12,26.91,41l-4.52-4.51,4.07-10.07,7.25,7.25ZM14.42,30l9.91-3.58L20.46,36,11,39.36Zm3.74,19.29-7.59-7.59L21,37.9l4.48,4.48-2.57,5.15Zm6.14-.1,5.78-2.08,4,5-4.78,9.6L22.39,53ZM31,62.54,35.81,53l10.84.66L42.46,62,41,62.7v.06ZM43,64.8h.31l.17-.34L53,68.94V79.79L43,75.1ZM65,75.1,55,79.79V69.19l7.07-3L65,69.12Zm2-6.81v-4l7.49-2.7,7.58,7.59L71.69,73Zm16.49-.47-7.57-7.57L80,50.18l7.25,7.25ZM90,45a2,2,0,1,1,2-2A2,2,0,0,1,90,45Z"
+                        />
+                      </svg>
+
+
+          <!-- <svg height='120px' width='120px'  fill="#3e15ca" xmlns="http://www.w3.org/2000/svg" data-name="Layer 2" viewBox="0 0 40 40" x="0px" y="0px"><title>essential</title><path d="M20,2A18,18,0,1,0,38,20,18.021,18.021,0,0,0,20,2ZM13.293,17.293a1,1,0,0,1,1.414,0L19,21.586V9a1,1,0,0,1,2,0V21.586l4.293-4.293a1,1,0,0,1,1.414,1.414l-6,6a1,1,0,0,1-1.414,0l-6-6A1,1,0,0,1,13.293,17.293ZM31,29a1,1,0,0,1-1,1H10a1,1,0,0,1-1-1V24a1,1,0,0,1,2,0v4H29V24a1,1,0,0,1,2,0Z"></path></svg> -->
+        </div>
+
+        <div style="width:70%; margin:0 auto;">
+          <p class="med-text" style="font-size:1.1em; margin-top:20px;">
+            Register a channel on the network to provide censorship-resistant content.
+          </p>
+        </div>
+      </div>
+
+      <table v-else class="uk-table uk-table-divider">
         <thead>
           <tr>
             <th>
@@ -305,6 +354,7 @@ export default {
         "#4947ef",
         "#bdbdbd",
       ],
+      loadingChannelError: false,
       error_result: false,
       pagination: {},
       channels: [],
@@ -518,22 +568,28 @@ export default {
       const paginator = new Pagination.Pagination(req);
       const paginationParams = paginator.extractPaginationData();
       this.loading = true;
-      const res = await this.getChannels(
-        paginationParams.limit,
-        paginationParams.offset
-      );
+      try {
+        const res = await this.getChannels(
+          paginationParams.limit,
+          paginationParams.offset
+        );
 
-      if (res.data.result.channels && res.data.result.channels != null) {
-        this.channels = [...res.data.result.channels];
+        if (res.data.result.channels && res.data.result.channels != null) {
+          this.channels = [...res.data.result.channels];
+        }
+
+        paginator.paginate({ rows: this.channels, count: res.data.result.total });
+        let pl = paginator.payload();
+        this.pagination = { ...pl };
+      } catch (e) {
+        this.loadingChannelError = true;
+      } finally {
+        this.loading = false;
       }
-
-      paginator.paginate({ rows: this.channels, count: res.data.result.total });
-      let pl = paginator.payload();
-      this.pagination = { ...pl };
-      this.loading = false;
+      
     },
     async getChannels(limit, offset) {
-      return await axios.post(this.rpcEndpoint, {
+      return axios.post(this.rpcEndpoint, {
         jsonrpc: "2.0",
         method: "channel_list",
         params: [limit, offset],

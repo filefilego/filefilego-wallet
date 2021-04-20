@@ -89,12 +89,12 @@ export default {
           this.$store.dispatch("SetBlockchainSettings", res.data.result);
         } catch (e) {
           // error
-          if (e.name == "NetworkError") {
-            this.$store.dispatch(
-              "SetFetchBlockchainInfoError",
-              "Error while connecting to the RPC server. Please make sure you are connected to internet."
-            );
-          }
+          
+          this.$store.dispatch(
+            "SetFetchBlockchainInfoError",
+            "Error while connecting to the RPC server. Please make sure you are connected to internet."
+          );
+          
         }
 
         ipcRenderer.sendSync("save_settings", settings);

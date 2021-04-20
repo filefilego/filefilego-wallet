@@ -41,7 +41,7 @@
           class="uk-text-center main-sidebar-item"
           style="font-size: 1em; padding-left: 12px; padding: 12px;"
         >
-          <span style="font-size:1.7em;" class="icon-home"></span>
+          <span style="font-size:1.7em;" class="icon-earth"></span>
           <div>Home</div>
         </li>
       </router-link>
@@ -94,6 +94,9 @@
 <script>
 export default {
   computed: {
+    isOffline() {
+      return this.$store.state.fetch_blockchain_info_error
+    },
     user() {
       return "";
     },

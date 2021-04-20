@@ -19,11 +19,6 @@
       </svg>
     </span>
 
-    <span
-      v-show="loading_wallet"
-      class="icon-spinner7 ffg-spinner"
-      style="font-size:2em; vertical-align:middle; margin-right:10px; color:#3e15ca; margin-top:12px; margin-left:10px;"
-    ></span>
 
     <span
       @click="goBack"
@@ -35,10 +30,10 @@
     ></span>
 
     <span
-      v-show="channel_view && !this.selected_wallet_status.unlocked"
-      style="display:inline-block; margin-top:10px; margin-left:10px; padding: 5px; vertical-align: middle; font-size:1.5em; color:red;"
-      class="icon-warning clickable"
-    ></span>
+      v-show="isOffline"
+      style="width:12px; height:12px; border-radius:50%; background-color:red; display:inline-block; margin-top:10px; margin-left:10px; padding: 5px; vertical-align: middle; font-size:1em; color:red;"
+      class=" clickable"
+    ></span><span v-show="isOffline" style=" display:inline-block; margin-top:7px; padding: 5px; vertical-align: middle; color:red;">offline</span>
 
     <div
       style="z-index: 99999999; position: fixed; right: 4px; top: 2px; margin-right: 8px; margin-top: 0px; "
@@ -77,6 +72,9 @@ export default {
     };
   },
   computed: {
+    isOffline() {
+      return this.$store.state.fetch_blockchain_info_error
+    },
     entryMode() {
       return this.$store.state.entryMode;
     },

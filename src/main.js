@@ -39,27 +39,32 @@ new Vue({
       return this.$store.state.rpc_endpoint;
     },
   },
-  async mounted() {
-    this.$router.push("/intro");
-    let settings = ipcRenderer.sendSync("load_settings");
-    this.$store.dispatch("SetSettings", settings);
-
-    try {
-      const res = await axios.post(this.rpcEndpoint, {
-        jsonrpc: "2.0",
-        method: "ffg_settings",
-        params: [],
-        id: 1,
-      });
-      this.$store.dispatch("SetBlockchainSettings", res.data.result);
-    } catch (e) {
-      if (e.name == "NetworkError") {
+  methods: {
+    async getRPCSettings() {
+      try {
+        const res = await axios.post(this.rpcEndpoint, {
+          jsonrpc: "2.0",
+          method: "ffg_settings",
+          params: [],
+          id: 1,
+        });
+        this.$store.dispatch("SetBlockchainSettings", res.data.result);
+      } catch (e) {
         this.$store.dispatch(
           "SetFetchBlockchainInfoError",
           "Error while connecting to the RPC server. Please make sure you are connected to internet."
         );
       }
-    }
+    },
+  },
+  async mounted() {
+    this.$router.push("/intro");
+    let settings = ipcRenderer.sendSync("load_settings");
+    this.$store.dispatch("SetSettings", settings);
+    await this.getRPCSettings();
+    setInterval(async () => {
+      await this.getRPCSettings();
+    }, 10000);
   },
 }).$mount("#app");
 

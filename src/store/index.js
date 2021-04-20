@@ -121,6 +121,7 @@ export default new Vuex.Store({
     pending_txs: [],
     loading_wallet: false,
     blockchain_settings: {
+      binlayer_engine_enabled: false,
       blockchain_version: "",
       block_time_seconds: 10,
       chain: "AQ==",
@@ -261,6 +262,7 @@ export default new Vuex.Store({
 
     SetBlockchainSettings(context, payload) {
       context.commit("SetBlockchainSettings", payload);
+      context.commit("SetFetchBlockchainInfoError", false);
     },
 
     SetLoadingWallet(context, payload) {

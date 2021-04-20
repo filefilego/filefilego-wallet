@@ -90,12 +90,28 @@
         </div>
 
         <div v-if="loading">
-          <div class="uk-text-center">
+
+            <div style="text-align: center; padding-top:20px;">
+              <div class="lds-roller">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+              
+            </div>
+
+
+          <!-- <div class="uk-text-center">
             <span
               class="ffg-spinner icon-spinner10"
               style="font-size:6em; color:#3e15ca; margin-right:6px; vertical-align: middle;"
             ></span>
-          </div>
+          </div> -->
         </div>
         <div v-else>
           <div v-if="!offline">
@@ -219,7 +235,7 @@
                       }}{{
                         HexAmountToAran(transaction.Transaction.Value)
                       }}
-                      Z</span
+                      Z <span style="font-size:0.7em;" :uk-tooltip="txFees(transaction.Transaction.TransactionFees)" class="icon icon-notification"></span></span
                     >
                   </td>
                 </tr>
@@ -512,6 +528,9 @@ export default {
     },
   },
   methods: {
+    txFees(fees) {
+      return this.HexAmountToAran(fees)
+    },
     async loadData(first) {
       if (this.loading) return;
       if (first) this.loading = true;

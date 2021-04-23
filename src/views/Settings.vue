@@ -28,6 +28,39 @@
       </div>
     </div>
 
+    <h4
+      style="color: rgb(13, 13, 13); padding-bottom:0; margin-bottom:0;"
+      class="header-display-1"
+    >
+      Binlayer Endpoint & Token
+    </h4>
+    <div style="margin-top:10px;">
+      <div class="uk-margin">
+        <div style="width:100%;" class="uk-inline">
+          <input
+            v-model="binlayerEndpoint"
+            class="uk-input"
+            type="text"
+            placeholder="Binlayer Endpoint"
+            required="true"
+          />
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <div class="uk-margin">
+        <div style="width:100%;" class="uk-inline">
+          <input
+            v-model="binlayerToken"
+            class="uk-input"
+            type="text"
+            placeholder="Binlayer Token"
+            required="true"
+          />
+        </div>
+      </div>
+    </div>
+
     <div class="uk-margin" style="">
       <button
         @click="SaveSettings()"
@@ -39,11 +72,11 @@
       ><br />
     </div>
 
-    <div style="margin-top:10px;">
+    <!-- <div style="margin-top:10px;">
       <div class="uk-margin">
         <pre>{{ blockchain_settings }}</pre>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -54,11 +87,19 @@ export default {
   data() {
     return {
       endpoint: "",
+      binlayerToken: "",
+      binlayerEndpoint: ""
     };
   },
   computed: {
     rpcEndpoint() {
       return this.$store.state.rpc_endpoint;
+    },
+    blEndpoint() {
+      return this.$store.state.binlayer.endpoint;
+    },
+    blToken() {
+      return this.$store.state.binlayer.authtoken;
     },
     blockchain_settings() {
       return this.$store.state.blockchain_settings;
@@ -71,40 +112,60 @@ export default {
     ) {
       this.endpoint = this.rpcEndpoint;
     }
+
+    if(this.blEndpoint != "") {
+      this.binlayerEndpoint = this.blEndpoint;
+    }
+
+    if (this.blToken != "") {
+      this.binlayerToken = this.blToken;
+    }
+
   },
   methods: {
     async SaveSettings() {
+      let settings = ipcRenderer.sendSync("load_settings");
       if (this.endpoint != "") {
-        let settings = ipcRenderer.sendSync("load_settings");
         settings.wallet_rpc_endpoint = this.endpoint;
-        this.$store.dispatch("SetSettings", settings);
-
-        try {
-          const res = await axios.post(this.rpcEndpoint, {
-            jsonrpc: "2.0",
-            method: "ffg_settings",
-            params: [],
-            id: 1,
-          });
-          this.$store.dispatch("SetBlockchainSettings", res.data.result);
-        } catch (e) {
-          // error
-          
-          this.$store.dispatch(
-            "SetFetchBlockchainInfoError",
-            "Error while connecting to the RPC server. Please make sure you are connected to internet."
-          );
-          
-        }
-
-        ipcRenderer.sendSync("save_settings", settings);
-        window.UIkit.notification({
-          message: "Settings were successfully saved",
-          status: "success",
-          pos: "top-center",
-          timeout: 900,
-        });
       }
+
+      if(this.binlayerToken != "") {
+        settings.binlayer_token = this.binlayerToken;
+      }
+
+      if(this.binlayerEndpoint != "") {
+        settings.binlayer_endpoint = this.binlayerEndpoint;
+      }
+      
+      this.$store.dispatch("SetSettings", settings);
+      try {
+        const res = await axios.post(this.rpcEndpoint, {
+          jsonrpc: "2.0",
+          method: "ffg_settings",
+          params: [],
+          id: 1,
+        });
+        this.$store.dispatch("SetBlockchainSettings", res.data.result);
+      } catch (e) {
+        // error
+        
+        this.$store.dispatch(
+          "SetFetchBlockchainInfoError",
+          "Error while connecting to the RPC server. Please make sure you are connected to internet."
+        );
+        
+      }
+
+      ipcRenderer.sendSync("save_settings", settings);
+      
+      window.UIkit.notification({
+        message: "Settings were successfully saved",
+        status: "success",
+        pos: "top-center",
+        timeout: 900,
+      });
+
+
     },
   },
 };

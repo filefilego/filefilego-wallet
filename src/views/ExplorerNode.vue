@@ -1352,7 +1352,7 @@ export default {
           feesHex = "0x" + unitUtil.toAran(fees, "zaran").toString(16);
         } catch (e) {
           this.feesError = e.message;
-          return;
+          return false
         }
 
         // this.loading_sendcoin = true;
@@ -1379,15 +1379,23 @@ export default {
         });
 
         if ("error" in rawRes.data) {
-          return;
+          return false
         }
 
+        return rawRes.data.result;
       } catch (e) {
-        console.log("Ex ", e)
+        return false
       } 
     },
     async prepareContract(totalFees, hash, peerID) {
       this.prepareContractError = ""
+      if(!this.selected_wallet_status.unlocked) {
+        this.prepareContractError = "You have to select a wallet and unlock it first. Go to 'Wallet' section."
+        return
+      }
+
+
+      
       this.loadingContractPrepare = true
       try {
         const res = await axios.post(this.rpcEndpoint, {
@@ -1402,7 +1410,27 @@ export default {
           let contractData = res.data.result.HexPayload,
               verifierAddr = res.data.result.VerifierAddr
 
-          await this.SendContract(totalFees, "0.0001", contractData, verifierAddr )
+          let txHash = await this.SendContract(totalFees, "0.0001", contractData, verifierAddr )
+          if (!txHash) {
+            // error
+            this.prepareContractError = "Error with your transaction. Make sure your request is valid and not too large"
+          } else {
+            let contractPayload = {
+              txHash: txHash,
+              contractHash: res.data.result.ContractHash,
+              nodes: res.data.result.Nodes,
+              fileInfos: res.data.result.FileInfos,
+              nodesNames: res.data.result.NodesNames,
+              timestamp: new Date()
+            };
+            this.$store.dispatch("AddToContracts", contractPayload);
+            let settings = ipcRenderer.sendSync("load_settings");
+            if(!Array.isArray(settings.contracts)) {
+              settings.contracts = []
+            }
+            settings.contracts.push(contractPayload)
+            ipcRenderer.sendSync("save_settings", settings);
+          }
         } else {
           this.prepareContractError = res.data.error.message
         }

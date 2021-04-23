@@ -120,6 +120,7 @@ export default new Vuex.Store({
     selected_wallet_status: { unlocked: false },
     pending_txs: [],
     loading_wallet: false,
+    contracts: [],
     blockchain_settings: {
       binlayer_engine_enabled: false,
       blockchain_version: "",
@@ -158,6 +159,19 @@ export default new Vuex.Store({
     SetUploadData(state, val) {
       state.upload_data = [...val];
     },
+    AddToContracts(state, val) {
+      let isDup =
+        state.contracts.filter(
+          (o) => o.txHash == val.txHash && o.contractHash == val.contractHash
+        ).length > 0;
+      if (!isDup) state.contracts.push(val);
+    },
+    SetContracts(state, val) {
+      state.contracts = [...val];
+    },
+    RemoveContract(state, index) {
+      state.contracts.splice(index, 1);
+    },
     RemoveUploadData(state, index) {
       state.upload_data.splice(index, 1);
     },
@@ -195,6 +209,18 @@ export default new Vuex.Store({
       if (settings.wallet_rpc_endpoint && settings.wallet_rpc_endpoint != "") {
         state.rpc_endpoint = settings.wallet_rpc_endpoint;
       }
+
+      if (settings.binlayer_token && settings.binlayer_token != "") {
+        state.binlayer.authtoken = settings.binlayer_token;
+      }
+
+      if (settings.binlayer_endpoint && settings.binlayer_endpoint != "") {
+        state.binlayer.endpoint = settings.binlayer_endpoint;
+      }
+
+      if (settings.contracts && settings.contracts.length != 0) {
+        state.contracts = settings.contracts;
+      }
     },
     SetBlockchainSettings(state, sts) {
       state.blockchain_settings = { ...sts };
@@ -215,6 +241,15 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    AddToContracts(context, payload) {
+      context.commit("AddToContracts", payload);
+    },
+    SetContracts(context, payload) {
+      context.commit("SetContracts", payload);
+    },
+    RemoveContract(context, payload) {
+      context.commit("RemoveContract", payload);
+    },
     SetCurrentNodeUpload(context, payload) {
       context.commit("SetCurrentNodeUpload", payload);
     },

@@ -220,6 +220,9 @@ ipcMain.on("load_settings", async (evt, arg) => {
 
   let jsonSettings = {
     wallet_rpc_endpoint: "",
+    binlayer_token: "",
+    binlayer_endpoint: "",
+    contracts: [],
   };
 
   if (fs.existsSync(destinationSettings)) {

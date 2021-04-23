@@ -35,7 +35,7 @@
     </div>
 
     <div v-show="!loading" style="padding-top: 20px">
-      <div class="uk-text-center" v-if="downloads.length == 0">
+      <div class="uk-text-center" v-if="contracts.length == 0">
         <h4
           style="color: rgb(13, 13, 13); padding-bottom: 11px;"
           class="header-display-1"
@@ -58,58 +58,25 @@
       <table v-else class="uk-table uk-table-divider">
         <thead>
           <tr>
-            <th>
-              <div
-                style="
-                  margin: 0px auto;
-                  width: 24px;
-                  font-weight: 600;
-                  color: white;
-                  font-size: 1.2em;
-                  text-align: left;
-                  border-radius: 50%;
-                  height: 24px;
-                  background-color: #bdbdbd;
-                "
-              ></div>
-            </th>
-            <th style="text-align: left;">Name</th>
+            <th style="text-align: left;">Hash</th>
+            <th style="text-align: left;">Contract hash</th>
             <th style="text-align:right;">Date Created</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(ch, idx) in downloads" :key="ch.Hash">
-            <td style="width: 34px; vertical-align: middle">
-              <div
-                :style="'background-color:' + getBgColor(idx)"
-                style="
-                  margin: 0px auto;
-                  width: 32px;
-                  font-weight: 600;
-                  color: white;
-                  font-size: 1.2em;
-                  text-align: center;
-                  border-radius: 50%;
-                  height: 32px;
-                "
-              >
-                {{ ch.Name | firstletter }}
+          <tr v-for="(ch, idx) in contracts" :key="'ctx' + idx">
+            <td class="uk-text-truncate">
+              <div>
+                {{ ch.txHash }}
               </div>
             </td>
-            <td>
-              <div style="vertical-align: middle">
-                <router-link
-                  style="font-weight: bold"
-                  :to="{ name: 'ExplorerViewNode', params: { hash: ch.Hash } }"
-                  >{{ ch.Name }}</router-link
-                >
-                <div style="font-size: 0.9em; padding: 0; margin: 0">
-                  {{ ch.Description }}
-                </div>
+            <td class="uk-text-truncate">
+              <div>
+                {{ ch.contractHash}}
               </div>
             </td>
-            <td style="vertical-align: middle; text-align:right;">
-              <div>{{ ch.Timestamp | timestamptodate }}</div>
+            <td class="uk-text-truncate">
+              <div>{{ ch.timestamp }}</div>
             </td>
           </tr>
         </tbody>
@@ -133,6 +100,9 @@ export default {
   async mounted() {
   },
   computed: {
+    contracts() {
+      return this.$store.state.contracts;
+    },
     selected_wallet_status() {
       return this.$store.state.selected_wallet_status;
     },
@@ -144,7 +114,22 @@ export default {
     },
   },
   methods: {
+    pathsToTree() {
+      let paths = [];
+      let result = [];
+      let level = {result};
 
+      paths.forEach(path => {
+        path.split('/').reduce((r, name) => {
+          if(!r[name]) {
+            r[name] = {result: []};
+            r.result.push({name, children: r[name].result})
+          }
+          return r[name];
+        }, level)
+      })
+      return result;
+    }
   },
 };
 </script>

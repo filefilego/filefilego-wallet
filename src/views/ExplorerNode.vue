@@ -248,7 +248,7 @@
             {{ node.node.Name }}
           </h4>
         </div>
-        <div class="uk-width-auto">
+        <div v-show="canCreate()" class="uk-width-auto">
           <div>
             <div>
               <span
@@ -549,7 +549,7 @@
             {{ node.node.Name }}
           </h4>
         </div>
-        <div class="uk-width-auto">
+        <div v-show="canCreate()" class="uk-width-auto">
           <div>
             <div>
               <span
@@ -1091,9 +1091,9 @@
                     <tbody>
                         <tr v-for="p in resultHosters" :key="p.FromPeerAddr">
                             <td style="text-align:left;" class="uk-width-1-4 uk-text-truncate">{{p.FromPeerAddr}}</td>
-                            <td style="text-align:left;" class="uk-width-2-4"><b>{{ HexAmountToAran(p.TotalFeesRequired).slice(0,7)}}</b> Zaran(s)</td>
+                            <td style="text-align:left;" class="uk-width-2-4"><b>{{ HexAmountToAran(p.TotalFeesGB).slice(0,7)}}</b> Zaran(s) / GB</td>
                             <td style="text-align:right;" class="uk-width-1-4">
-                               <div @click="prepareContract(p.TotalFeesRequired, p.Hash, p.FromPeerAddr)" uk-tooltip="Download" style="cursor:pointer; margin-left:7px; display:inline-block; width:32px; height:32px; border-radius:50%; background-color:#e1e1e1; vertical-align:middle;  text-align:center;">
+                               <div @click="prepareContract(p.TotalFeesGB, p.Hash, p.FromPeerAddr)" uk-tooltip="Download" style="cursor:pointer; margin-left:7px; display:inline-block; width:32px; height:32px; border-radius:50%; background-color:#e1e1e1; vertical-align:middle;  text-align:center;">
                                 <span style="color:#4caf50; font-size:1.2em; vertical-align:middle;" class="icon-download3"></span>
                               </div>
                             </td>
@@ -1261,6 +1261,7 @@ export default {
         "#bdbdbd",
       ],
       subchannel: { name: "", description: "" },
+      path: [],
       subchans: [],
       data: [],
       node: { node: { NodeType: -1 } },
@@ -1303,6 +1304,36 @@ export default {
     },
   },
   methods: {
+    base64ToHex(str) {
+      const raw = atob(str);
+      let result = '';
+      for (let i = 0; i < raw.length; i++) {
+        const hex = raw.charCodeAt(i).toString(16);
+        result += (hex.length === 2 ? hex : '0' + hex);
+      }
+      return "0x" + result.toLowerCase();
+    },
+    canCreate() {
+      try {
+        if (!this.selected_wallet_status.unlocked) {
+          return false;
+        } else {
+          if (this.path.length > 0) {
+            let found = false;
+            this.path.map((o) => {
+              if(this.selected_wallet_status.address.split("--")[2] == this.base64ToHex(o.Owner)) {
+                found = true
+              }
+            })
+            return found
+          } else {
+            return false
+          }
+        }
+      } catch (e) {
+        return false
+      }
+    },
     HexAmountToAran(val) {
       let amount = new BN(val.slice(2), 16);
       return unitUtil.fromAran(amount.toString(10), "zaran").toString(10);
@@ -2084,6 +2115,10 @@ export default {
       } else if (res.data.result && res.data.result.childs) {
         this.subchans = res.data.result.childs.filter((o) => o.NodeType == 4);
         this.data = res.data.result.childs.filter((o) => o.NodeType != 4);
+      } 
+      
+      if (res.data.result.path) {
+        this.path = [...res.data.result.path];
       }
     },
   },

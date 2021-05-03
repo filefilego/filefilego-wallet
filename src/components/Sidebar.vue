@@ -62,7 +62,7 @@
           style="font-size: 1em; padding-left: 12px; padding: 12px;"
         >
           <span style="font-size:1.7em;" class="icon-infinite"></span>
-          <div>Explorer</div>
+          <div>Channels</div>
         </li>
       </router-link>
 
@@ -75,8 +75,6 @@
           <div>Downloads</div>
         </li>
       </router-link>
-
-
 
       <router-link to="/settings">
         <li
@@ -95,7 +93,7 @@
 export default {
   computed: {
     isOffline() {
-      return this.$store.state.fetch_blockchain_info_error
+      return this.$store.state.fetch_blockchain_info_error;
     },
     user() {
       return "";

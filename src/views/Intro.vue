@@ -12,7 +12,7 @@
         style="color: rgb(13, 13, 13); padding-bottom: 11px;"
         class="header-display-1"
       >
-        The wallet and explorer application
+        The wallet and channel explorer application
       </h4>
       <div
         style="background-color:#fff; border-radius:50%; border:2px solid #3e15ca; width:120px; height:120px; text-align:center; margin:0 auto;"
@@ -43,7 +43,7 @@
         <p class="med-text" style="font-size:1.1em; margin-top:20px;">
           This application allows you to send and receive native filefilego
           coins which are called "ZARAN(s)". You can also explore the blockchain
-          by clicking on the "Explorer" tab and access/download data stored
+          by clicking on the "Channels" tab and access/download data stored
           within the decentralized network.
         </p>
       </div>

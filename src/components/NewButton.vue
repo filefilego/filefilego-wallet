@@ -91,6 +91,8 @@ export default {
     },
     selectFiles(e) {
       for (let i = 0; i < e.target.files.length; i++) {
+        if(e.target.files[i].size <= 0) continue;
+        
         let payload = {
           size: e.target.files[i].size,
           canceled: false,

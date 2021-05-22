@@ -139,7 +139,7 @@ export default new Vuex.Store({
   },
   mutations: {
     SetCurrentNodeUpload(state, val) {
-      state.current_node_upload = { ...val };
+      if(!val) state.current_node_upload = false; else state.current_node_upload = { ...val };
     },
     AddToUploadData(state, val) {
       let isConflict =

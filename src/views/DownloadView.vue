@@ -40,7 +40,7 @@
         <div v-show="!loading">
           <div class="uk-text-center" v-if="contracts.length == 0">
             <h4
-              style="color: rgb(13, 13, 13); padding-bottom: 11px;"
+              style="color: rgb(13, 13, 13); padding-bottom: 11px; margin-top:20px;"
               class="header-display-1"
             >
               There are no downloads yet
@@ -58,7 +58,7 @@
                 x="0px"
                 y="0px"
               >
-                <title>essential</title>
+                <title></title>
                 <path
                   d="M20,2A18,18,0,1,0,38,20,18.021,18.021,0,0,0,20,2ZM13.293,17.293a1,1,0,0,1,1.414,0L19,21.586V9a1,1,0,0,1,2,0V21.586l4.293-4.293a1,1,0,0,1,1.414,1.414l-6,6a1,1,0,0,1-1.414,0l-6-6A1,1,0,0,1,13.293,17.293ZM31,29a1,1,0,0,1-1,1H10a1,1,0,0,1-1-1V24a1,1,0,0,1,2,0v4H29V24a1,1,0,0,1,2,0Z"
                 ></path>
@@ -67,7 +67,7 @@
 
             <div style="width:70%; margin:0 auto;">
               <p class="med-text" style="font-size:1.1em; margin-top:20px;">
-                You can use the "Explorer" tab to browse different channels and
+                You can use the "Channels" tab to browse different channels and
                 download data.
               </p>
             </div>

@@ -242,7 +242,7 @@
         <div class="uk-width-expand">
           <h4
             v-if="node.node"
-            style="color: rgb(13, 13, 13); padding-bottom: 11px"
+            style="color: rgb(13, 13, 13); padding-bottom: 11px; "
             class="header-display-1"
           >
             {{ node.node.Name }}
@@ -273,7 +273,7 @@
                   <li @click="openNewFolderModal" class="clickable">
                     <span class="icon-folder"></span> New folder
                   </li>
-                  <li v-if="binlayerEnabled" class="clickable">
+                  <li @click="openUploadModal" v-if="binlayerEnabled" class="clickable">
                     <span class="icon-upload"></span> Upload
                   </li>
                 </ul>
@@ -465,9 +465,8 @@
                         style="width:32px; height:32px; font-size: 32px; vertical-align: middle; "
                       />
                     </td>
-                    <td>
+                    <td style="width:70%;" class="uk-text-nowrap uk-text-truncate" >
                       <div style="vertical-align: middle">
-                        
                         <router-link
                           style="font-weight: bold"
                           :to="{
@@ -489,7 +488,7 @@
                          {{ ch.Timestamp | timestamptodate }}
                         </span>
 
-                        <div @click="openSearchProviderModal(ch)" style="cursor:pointer; margin-left:7px; display:inline-block; width:32px; height:32px; border-radius:50%; background-color:#e1e1e1; vertical-align:middle;  text-align:center;">
+                        <div v-show="ch.NodeType == 1 || ch.NodeType == 2" @click="openSearchProviderModal(ch)" style="cursor:pointer; margin-left:7px; display:inline-block; width:32px; height:32px; border-radius:50%; background-color:#e1e1e1; vertical-align:middle;  text-align:center;">
                           <span style="color:#3e15ca; font-size:1.2em; vertical-align:middle;" class="icon-download3"></span>
                         </div>
                         <!-- <div v-for="h in resultHosters" :key="h.FromPeerAddr">
@@ -568,7 +567,7 @@
                   <li @click="openNewFolderModal" class="clickable">
                     <span class="icon-folder"></span> New folder
                   </li>
-                  <li class="clickable">
+                  <li @click="openUploadModal" class="clickable">
                     <span class="icon-upload"></span> Upload
                   </li>
                 </ul>
@@ -615,12 +614,19 @@
 
           <div style="padding: 0px; margin: 0px">
             <div style="background-color: #f0f0f0; margin: 0; padding: 0">
-              <h4
-                style="color: rgb(13, 13, 13); padding: 7px; margin: 0px"
-                class="header-display-1"
-              >
-                Data
-              </h4>
+              <div uk-grid>
+                <div class="uk-width-expand">
+                  <h4
+                    style="color: rgb(13, 13, 13); padding: 7px; margin: 0px"
+                    class="header-display-1"
+                  >
+                    Data
+                  </h4>
+                </div>
+                <div class="uk-width-auto">
+                  <button @click="openSearchProviderModal(node.node)" v-show="node.childs != null" type="button" class="uk-button uk-button-default" style="margin-right:10px; margin-top:7px; border-radius: 3px; width: 150px; line-height: 20px; height: 30px; background-color: #2c0fcd; color: rgb(255, 255, 255); border: 1px solid #180141; font-weight: bold; padding: 0px; " > <span class="icon-download3" style="margin-right: 10px"></span> Download All </button>
+                </div>
+              </div>
             </div>
             <div style="margin: 0px; padding: 0px">
               <table class="uk-table uk-table-divider">
@@ -639,7 +645,6 @@
                         text-align: center;
                         border-radius: 5px;
                         height: 32px;
-                        
                       "
                       >
                         {{ ch.Name | firstletter }}
@@ -671,7 +676,14 @@
                       </div>
                     </td>
                     <td style="vertical-align: middle; text-align:right;">
-                      <div>{{ ch.Timestamp | timestamptodate }}</div>
+                      <div style=""> 
+                        <span style="vertical-align:middle;">
+                         {{ ch.Timestamp | timestamptodate }}
+                        </span>
+                        <div v-show="ch.NodeType == 1 || ch.NodeType == 2" @click="openSearchProviderModal(ch)" style="cursor:pointer; margin-left:7px; display:inline-block; width:32px; height:32px; border-radius:50%; background-color:#e1e1e1; vertical-align:middle;  text-align:center;">
+                          <span style="color:#3e15ca; font-size:1.2em; vertical-align:middle;" class="icon-download3"></span>
+                        </div>
+                      </div>
                     </td>
                   </tr>
                   <tr v-if="data.length == 0">
@@ -811,7 +823,7 @@
           style="border: 1px solid #e3e3e3; border-radius: 2px; padding:7px;"
         >
           <div>
-            file
+            file info
           </div>
         </div>
       </div>
@@ -949,6 +961,7 @@
       </div>
     </div>
 
+
     <div ref="create_folder" class="uk-modal" uk-modal="bg-close:false;">
       <div class="uk-modal-dialog uk-margin-auto-vertical">
         <button
@@ -1036,6 +1049,142 @@
                 >
                   Please wait
                 </h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div ref="upload_modal" class="uk-modal" uk-modal="bg-close:false;">
+      <div class="uk-modal-dialog uk-margin-auto-vertical">
+        <button
+          class="uk-modal-close-default"
+          style="left: 5px; top: 15px; right: 0px"
+          type="button"
+          uk-close
+        ></button>
+        <div class="uk-modal-header">
+          <div uk-grid>
+            <div class="uk-width-1-2">
+              <h2 style="font-size: 1.1em; float:left;" class="uk-modal-title header-display-1">
+                Upload
+              </h2>
+            </div>
+            <div v-show="!loadingBalance" class="uk-width-1-2" style="text-align:right; padding:0px;">
+                <button @click="startUploadWithoutNewParent" type="button" class="uk-button uk-button-default ffg-main-button" style=" border-radius: 3px; width: 100px; line-height: 25px; height: 35px; background-color: #2c0fcd; color: rgb(255, 255, 255); border: 1px solid #180141; font-weight: bold; padding: 0px; " > Upload </button>
+            </div>
+          </div>
+        </div>
+        <div style="padding: 0" class="uk-modal-body">
+          <div
+            style="padding: 5px"
+          >
+
+            <div v-if="loadingBalance">
+              <div style="text-align: center; padding-top:20px;">
+                <div class="lds-roller">
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                </div>
+                <div style="width: 70%; margin: 0 auto">
+                  <h4
+                    style="color: rgb(13, 13, 13); padding-bottom: 11px"
+                    class="header-display-1"
+                  >
+                    Please wait
+                  </h4>
+                </div>
+              </div>
+            </div>
+
+
+            <div v-else>
+              <new-button/>
+
+              <div style="padding-top:10px;  max-height:300px; overflow-y:auto;">
+                <div
+                  v-for="(u, idx) in upload_data"
+                  :key="'up' + idx"
+                  style="border-top:1px solid #ededed; padding:0px; margin:0px; padding-bottom:8px;"
+                  uk-grid
+                >
+                  <div class="uk-width-expand" style="vertical-align:middle;">
+                    <div style="padding:10px;" uk-grid>
+                      <div class="uk-width-1-1" style="padding:0px; margin:0px;">
+                        <div
+                          style="color:#3f383f;  -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; white-space: normal; -webkit-line-clamp: 1; display: -webkit-box; color: #2c3e50; margin-bottom: 0; vertical-align: middle;"
+                        >
+                          <span
+                            v-if="u.type == 'dir'"
+                            style="color:#818284; font-size:1.3em; vertical-align:middle;"
+                            class="icon-folder"
+                          ></span>
+                          <img
+                            v-if="u.type == 'file'"
+                            :src="nodeVector(u.name)"
+                            style="width:24px; height:24px; font-size: 32px; vertical-align: middle; "
+                          />
+                          <span
+                            v-if="!u.canceled && u.error == ''"
+                            style="margin-left:5px; font-weight:bold; vertical-align:middle;"
+                            >{{ u.name }}</span
+                          >
+                          <span
+                            v-if="u.canceled || u.error != ''"
+                            style="margin-left:5px; font-weight:bold; vertical-align:middle;"
+                            ><strike style="color:red;">{{ u.name }}</strike> <span v-if="u.error != ''">({{u.error}})</span></span
+                          >
+                        </div>
+                      </div>
+                      <div class="uk-width-expand" style="padding:0px; margin:0px;">
+                        <span style="color:#7e7e7e; font-weight:bold;">{{u.size | formatsize}}</span>
+                      </div>
+                      <div
+                        class="uk-width-auto"
+                        style="padding:0px; margin:0px; vertical-align:middle;"
+                      >
+                        <span
+                          style="color:#7e7e7e; display:inline-block; font-weight:bold;"
+                          >{{ getProgress(u) }}%</span
+                        >
+                      </div>
+                      <div class="uk-width-1-1" style="padding:0px; margin:0px;">
+                        <div style="height:8px; background-color:#e6e6e6;">
+                          <div
+                            :style="'width: ' +getProgress(u) + '%;'"
+                            style="background-color:#5cb85c; height:8px;"
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="uk-width-auto">
+                    <div style="padding:5px;">
+                      <span
+                        uk-tooltip="Remove"
+                        v-if="u.canceled || u.size == u.progress"
+                        @click="removeItemFromUpload(idx)"
+                        style="font-size:1.4em; margin-top:26px; display:inline-block;"
+                        class="clickable icon-bin2"
+                      ></span>
+                      <span
+                        uk-tooltip="Cancel"
+                        v-else
+                        @click="cancelItemFromUpload(idx)"
+                        style="font-size:1.4em; margin-top:26px; display:inline-block;"
+                        class="clickable icon-cancel-circle"
+                      ></span>
+                    
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1315,6 +1464,7 @@ export default {
     },
     canCreate() {
       try {
+        if(this.node.node.NodeType == 1) return false;
         if (!this.selected_wallet_status.unlocked) {
           return false;
         } else {
@@ -1535,6 +1685,185 @@ export default {
       let pg = parseInt((node.progress / node.size) * 100)
       return pg > 100 ? 100 : pg;
     },
+    async createEntriesFromUpload() {
+      let chEnvelp = new messages.ChanNodeEnvelop();
+      this.upload_data.map((o)=> {
+        if(o.error != '' || o.canceled) return;
+
+        if(o.type == "file") {
+          let tmpN = new messages.ChanNode();
+          tmpN.setName(o.name);
+          tmpN.setNodetype(messages.ChanNodeType.FILE);
+          tmpN.setParenthash(o.file.parentHash);
+          tmpN.setBinlayerhash(o.file.file_hash);
+          tmpN.setMerkleroot(o.file.merkle_root);
+          let sizeBig = new BN(o.file.file.size, 10).toString(16);
+          tmpN.setSize('0x'+sizeBig);
+          chEnvelp.addNodes(tmpN);
+
+        } else if(o.type == "dir") {
+          
+          o.files.map((j) => {
+            let tmpN = new messages.ChanNode();
+            tmpN.setName(j.name);
+            tmpN.setParenthash(j.parentHash);
+
+            if("file" in j) {
+              tmpN.setNodetype(messages.ChanNodeType.FILE);
+              let sizeBig = new BN(j.file.size, 10).toString(16);
+              tmpN.setSize('0x'+sizeBig);
+              tmpN.setBinlayerhash(j.file_hash);
+              tmpN.setMerkleroot(j.merkle_root);
+              
+            } else {
+              tmpN.setNodetype(messages.ChanNodeType.DIR);
+            }
+            tmpN.setParenthash(j.parentHash);
+            chEnvelp.addNodes(tmpN);            
+          })
+
+        }
+      })
+
+
+      // clear the current files
+      this.$store.dispatch("SetUploadData", []);
+     
+
+      let chanPayload = new messages.TransactionDataPayload();
+      chanPayload.setType(messages.TransactionDataPayloadType.CREATE_NODE);
+      chanPayload.setPayload(chEnvelp.serializeBinary());
+
+      let txData = chanPayload.serializeBinary();
+
+      try {
+        this.loadingBalance = true;
+        if (!this.selected_wallet_status.unlocked) {
+          this.channel_creation_error =
+            "You have to select a wallet and unlock it first. Go to 'Wallet' section.";
+          return;
+        }
+        let addr = this.addressFromKeyname(this.selected_wallet_status.address);
+        const res = await axios.post(this.rpcEndpoint, {
+          jsonrpc: "2.0",
+          method: "account_balance",
+          params: [addr],
+          id: 1,
+        });
+
+        let balance = new BN(res.data.result.balance_hex.slice(2), 16);
+        // let balanceFinal = unitUtil.fromAran(balance.toString(10), "zaran").toString(10);
+        let txFee = new BN(
+          this.blockchain_settings.node_creation_fees_guest,
+          10
+        );
+
+        if (balance.lt(txFee)) {
+          this.channel_creation_error =
+            "* Entry creation requires " +
+            unitUtil.fromAran(txFee.toString(10), "zaran").toString(10) +
+            " ZARANS. You don't have enough balance";
+          return;
+        }
+
+        let amountHex;
+        try {
+          amountHex = "0x" + unitUtil.toAran("0", "aran").toString(16);
+        } catch (e) {
+          this.channel_creation_error = e.message;
+          return;
+        }
+
+        let feesHex;
+        try {
+          feesHex =
+            "0x" +
+            unitUtil
+              .toAran(this.blockchain_settings.node_creation_fees_guest, "aran")
+              .toString(16);
+        } catch (e) {
+          this.channel_creation_error = e.message;
+          return;
+        }
+
+        let tx = {
+          Nounce: res.data.result.next_nounce,
+          Data: Buffer.from(txData).toString("hex"),
+          From: addr,
+          To: this.blockchain_settings.verifiers[0].address,
+          Value: amountHex,
+          TransactionFees: feesHex,
+          Signature: "",
+          Hash: "",
+          Chain: "0x01",
+        };
+
+        let signedTx = ipcRenderer.sendSync("sign_transaction", tx);
+
+        const rawRes = await axios.post(this.rpcEndpoint, {
+          jsonrpc: "2.0",
+          method: "transaction_sendRawTransaction",
+          params: [JSON.stringify(signedTx)],
+          id: 1,
+        });
+
+        if ("error" in rawRes.data) {
+          this.channel_creation_error = rawRes.data.error.message;
+          return;
+        }
+
+        // tx send, now wait for confirmation
+        this.lastTxHash = rawRes.data.result;
+        let tryies = 0;
+        let foundTx = false;
+        while (!foundTx) {
+          if (tryies > 7) break;
+
+          await new Promise((resolve) => {
+            setTimeout(() => {
+              resolve(true);
+            }, 2000);
+          });
+
+          const txRec = await axios.post(this.rpcEndpoint, {
+            jsonrpc: "2.0",
+            method: "transaction_receipt",
+            params: [this.lastTxHash],
+            id: 1,
+          });
+
+          if ("result" in txRec.data) {
+            this.loading = true;
+            await this.getNode(this.$route.params.hash);
+            window.UIkit.modal(this.$refs.upload_modal).hide();
+            this.loading = false;
+            foundTx = true;
+          }
+
+          tryies++;
+        }
+
+        if (!foundTx) {
+          this.channel_creation_error =
+            "It may take a few seconds for your entry to be available. Please reload";
+        }
+      } catch (e) {
+        this.channel_creation_error =
+          "Unexpected error. Make sure you are connected to internet!";
+      } finally {
+        this.loadingBalance = false;
+      }
+
+    },
+    startUploadWithoutNewParent() {
+        if(this.upload_data.length == 0) {
+          alert("Please select files/folders to upload")
+          return
+        }
+
+        let p = { cb: this.createEntriesFromUpload }
+        this.$store.dispatch("StartUploadQueue", p);
+    },
     startUpload() {
       if(this.upload_data.length == 0) {
         this.createEntry();
@@ -1542,7 +1871,6 @@ export default {
         let p = { type: "entry", cb: this.createEntry }
         this.$store.dispatch("StartUploadQueue", p);
       }
-      
     },
     cancelItemFromUpload(idx) {
       this.$store.dispatch("CancelUploadData", idx);
@@ -1723,6 +2051,13 @@ export default {
     openNewFolderModal() {
       this.channel_creation_error = "";
       window.UIkit.modal(this.$refs.create_folder).show();
+      UIkit.dropdown(document.getElementById("new_dropdown")).hide();
+    },
+    async openUploadModal() { 
+      await this.$store.dispatch("SetCurrentNodeUpload", false)
+      this.$store.dispatch("SetCurrentNodeUpload", this.node.node)
+      this.channel_creation_error = "";
+      window.UIkit.modal(this.$refs.upload_modal).show();
       UIkit.dropdown(document.getElementById("new_dropdown")).hide();
     },
     openSubchannelModal() {

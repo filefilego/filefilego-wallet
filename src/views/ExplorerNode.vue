@@ -1223,13 +1223,17 @@
                 </span>
               </div>
               <div v-else> 
-
-                <h2 style="font-size: 1.1em; padding:0px; margin:0px;" class="uk-modal-title header-display-1">
+                
+                <h2 v-if="hasNotUnavailableNodes()" style="font-size: 1.1em; padding:0px; margin:0px;" class="uk-modal-title header-display-1">
                   <!-- <span class="icon-checkmark"></span>  -->
                   Please select a provider:
                 </h2>
 
-                <table style="padding:0px; margin:0px;" class="uk-table uk-table-striped">
+                <h2 v-else style="font-size: 1.1em; padding:0px; margin:0px;" class="uk-modal-title header-display-1">
+                  Download available by combining {{resultHosters.length}} providers
+                </h2>
+
+                <table v-if="hasNotUnavailableNodes()" style="padding:0px; margin:0px;" class="uk-table uk-table-striped">
                     <thead>
                         <tr>
                             <th>Peer</th>
@@ -1238,7 +1242,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="p in resultHosters" :key="p.FromPeerAddr">
+                      <template v-for="p in resultHosters">
+                        <tr v-if="!('UnavailableNodes' in p)" :key="p.FromPeerAddr">
                             <td style="text-align:left;" class="uk-width-1-4 uk-text-truncate">{{p.FromPeerAddr}}</td>
                             <td style="text-align:left;" class="uk-width-2-4"><b>{{ HexAmountToAran(p.TotalFeesGB).slice(0,7)}}</b> Zaran(s) / GB</td>
                             <td style="text-align:right;" class="uk-width-1-4">
@@ -1247,9 +1252,12 @@
                               </div>
                             </td>
                         </tr>
-                        
+                      </template>
                     </tbody>
                 </table>
+                <div v-if="!hasNotUnavailableNodes()">
+                  <button type="button" class="uk-button uk-button-default" style="margin-right:10px; margin-top:7px; border-radius: 3px; width: 150px; line-height: 20px; height: 30px; background-color: #2c0fcd; color: rgb(255, 255, 255); border: 1px solid #180141; font-weight: bold; padding: 0px; " > <span class="icon-download3" style="margin-right: 10px"></span> Download </button>
+                </div>
 
                 <span
                   v-if="prepareContractError!= ''"                  
@@ -1453,6 +1461,12 @@ export default {
     },
   },
   methods: {
+    hasNotUnavailableNodes() {
+      return this.resultHosters.filter((o) => { 
+        if(!("UnavailableNodes" in o)) return true;
+        return false;
+      }).length > 0
+    },
     base64ToHex(str) {
       const raw = atob(str);
       let result = '';
